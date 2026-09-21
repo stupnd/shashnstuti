@@ -81,7 +81,7 @@ export default async function HomePage() {
           <ActionCard href="/watch" icon="sparkle" color="var(--sky)">watch<br />our story</ActionCard>
           <ActionCard href="/ask" icon="eyes" color="var(--lilac)">ask<br />the book</ActionCard>
           <ActionCard href="/flip" icon="heart" color="var(--mint)">flip<br />through us</ActionCard>
-          <ActionCard href="/new" icon="camera" color="var(--peach)">add a<br />moment</ActionCard>
+          <ActionCard href="/play" icon="dice" color="var(--butter)">play<br />a game</ActionCard>
         </div>
 
         {memory && (

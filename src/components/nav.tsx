@@ -34,7 +34,14 @@ function Tab({ href, label, icon, color, active }: { href: string; label: string
 export function Nav() {
   const pathname = usePathname();
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
-  if (pathname.startsWith("/wrapped/") || pathname.startsWith("/watch") || pathname.startsWith("/flip")) return null;
+  if (
+    pathname.startsWith("/wrapped/") ||
+    pathname.startsWith("/watch") ||
+    pathname.startsWith("/flip") ||
+    (pathname.startsWith("/play/") && pathname !== "/play")
+  ) {
+    return null;
+  }
 
   return (
     <nav

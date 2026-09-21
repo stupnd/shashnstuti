@@ -45,8 +45,8 @@ function flatten(entries: EntryCard[]): FlipCard[] {
 
 /**
  * Tinder-style deck: every swipe throws the whole card away and reveals the
- * next photo. No paging through a moment's gallery first — left = skip,
- * right = heart the moment, tap = open it.
+ * next photo. No paging through a moment's gallery first — left = heart,
+ * right = double heart, tap = open it.
  */
 export function Deck({ initial, initialCursor, shuffle }: { initial: EntryCard[]; initialCursor: Cursor | null; meId: string; shuffle: boolean }) {
   const router = useRouter();
@@ -59,7 +59,7 @@ export function Deck({ initial, initialCursor, shuffle }: { initial: EntryCard[]
   const [pending, startTransition] = useTransition();
   const start = useRef<{ x: number; y: number; t: number } | null>(null);
   const moved = useRef(false);
-  const hearted = useRef(new Set<string>());
+  const reacted = useRef(new Set<string>());
   const flyDist = useRef(480);
 
   const cards = useMemo(() => {
@@ -89,10 +89,11 @@ export function Deck({ initial, initialCursor, shuffle }: { initial: EntryCard[]
       if (flying) return;
       const card = cards[i];
       setFlying(dir);
-      if (dir === "right" && card && !hearted.current.has(card.entry.id)) {
-        hearted.current.add(card.entry.id);
+      if (card && !reacted.current.has(card.entry.id)) {
+        reacted.current.add(card.entry.id);
         setBurst((b) => b + 1);
-        addReaction(card.entry.id, "heart", "").catch(() => {});
+        const emoji = dir === "right" ? "hearts" : "heart";
+        addReaction(card.entry.id, emoji, "").catch(() => {});
       }
       setTimeout(() => {
         setFlying(null);
@@ -214,8 +215,12 @@ export function Deck({ initial, initialCursor, shuffle }: { initial: EntryCard[]
 
               {isTop && (
                 <>
-                  <span className="absolute left-5 top-6 rotate-[-14deg] rounded-xl border-4 border-[#3ec98f] px-3 py-1 font-marker text-3xl text-[#3ec98f]" style={{ opacity: like }}>love</span>
-                  <span className="absolute right-5 top-6 rotate-[14deg] rounded-xl border-4 border-[#ff7a7a] px-3 py-1 font-marker text-3xl text-[#ff7a7a]" style={{ opacity: nope }}>next</span>
+                  <span className="absolute left-5 top-6 flex rotate-[-14deg] items-center rounded-xl border-4 border-[#3ec98f] px-3 py-1 text-[#3ec98f]" style={{ opacity: like }} aria-hidden>
+                    <Icon name="hearts" size={28} />
+                  </span>
+                  <span className="absolute right-5 top-6 flex rotate-[14deg] items-center rounded-xl border-4 border-[var(--accent)] px-3 py-1 text-[var(--accent)]" style={{ opacity: nope }} aria-hidden>
+                    <Icon name="heart" size={28} />
+                  </span>
                 </>
               )}
 
@@ -240,9 +245,9 @@ export function Deck({ initial, initialCursor, shuffle }: { initial: EntryCard[]
       </div>
 
       <div className="flex items-center justify-center gap-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))]">
-        <button type="button" onClick={() => commit("left")} aria-label="Next" className="btn btn-soft h-14 w-14 rounded-full p-0"><Icon name="close" size={24} strokeWidth={2.4} /></button>
+        <button type="button" onClick={() => commit("left")} aria-label="Heart" className="btn btn-soft h-14 w-14 rounded-full p-0"><Icon name="heart" size={26} /></button>
         <Link href={`/entry/${top.entry.id}`} transitionTypes={["nav-forward"]} className="btn btn-sky h-12 rounded-full px-5">open</Link>
-        <button type="button" onClick={() => commit("right")} aria-label="Love it" className="btn btn-primary h-14 w-14 rounded-full p-0"><Icon name="heartFilled" size={26} /></button>
+        <button type="button" onClick={() => commit("right")} aria-label="Double heart" className="btn btn-primary h-14 w-14 rounded-full p-0"><Icon name="hearts" size={26} /></button>
       </div>
       <p className="label pb-2 text-center text-[9px]">{i + 1} / {cards.length}{cursor ? "+" : ""}</p>
     </div>

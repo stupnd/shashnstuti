@@ -8,6 +8,13 @@ import type { SVGProps } from "react";
 const P = {
   heart: <path d="M12 20.3c-1-.8-7.6-5.3-8.2-9.9C3.4 7.1 5.6 4.9 8 5.1c1.6.1 2.9 1 4 2.6 1.1-1.6 2.4-2.5 4-2.6 2.4-.2 4.6 2 4.2 5.3-.6 4.6-7.2 9.1-8.2 9.9Z" />,
   heartFilled: <path d="M12 20.3c-1-.8-7.6-5.3-8.2-9.9C3.4 7.1 5.6 4.9 8 5.1c1.6.1 2.9 1 4 2.6 1.1-1.6 2.4-2.5 4-2.6 2.4-.2 4.6 2 4.2 5.3-.6 4.6-7.2 9.1-8.2 9.9Z" fill="currentColor" />,
+  /** Two overlapping hearts — “double love” reaction. */
+  hearts: (
+    <>
+      <path d="M8.2 18.8c-.8-.6-5.8-4-6.3-7.5C1.6 8.8 3.3 7.1 5.1 7.3c1.2.1 2.2.8 3 2 .9-1.2 1.8-1.9 3-2 1.8-.2 3.5 1.5 3.2 4-.5 3.5-5.5 6.9-6.1 7.5Z" />
+      <path d="M15.8 18.8c-.8-.6-5.8-4-6.3-7.5C9.2 8.8 10.9 7.1 12.7 7.3c1.2.1 2.2.8 3 2 .9-1.2 1.8-1.9 3-2 1.8-.2 3.5 1.5 3.2 4-.5 3.5-5.5 6.9-6.1 7.5Z" fill="currentColor" />
+    </>
+  ),
   star: <path d="M12 3.6l2.5 5.3 5.8.7-4.3 4 1.2 5.8L12 16.6l-5.2 2.8 1.2-5.8-4.3-4 5.8-.7Z" />,
   sparkle: <><path d="M12 3.5c.5 4.4 2.2 6.5 7 7.5-4.8 1-6.5 3.1-7 7.5-.5-4.4-2.2-6.5-7-7.5 4.8-1 6.5-3.1 7-7.5Z" /><path d="M19 3v3M17.5 4.5h3" /></>,
   camera: <><path d="M4.5 8.5h3.2l1.5-2.4h5.6l1.5 2.4h3.2c.6 0 1 .5 1 1V18c0 .6-.4 1-1 1h-15c-.6 0-1-.4-1-1V9.5c0-.5.4-1 1-1Z" /><circle cx="12" cy="13.5" r="3.2" /></>,
@@ -109,11 +116,12 @@ export const MOODS: { key: IconName; label: string }[] = [
   { key: "rainbow", label: "rainbow" },
 ];
 
-export const REACTIONS: IconName[] = ["heart", "laugh", "teary", "starry", "fire", "hug", "cry", "eyes"];
+export const REACTIONS: IconName[] = ["heart", "hearts", "laugh", "teary", "starry", "fire", "hug", "cry", "eyes"];
 
 /** Older rows may hold emoji; map the common ones onto icons. */
 const EMOJI_TO_ICON: Record<string, IconName> = {
   "🤍": "heart", "🩷": "heart", "❤️": "heart", "💗": "heart", "💙": "heart",
+  "💕": "hearts", "💞": "hearts", "💖": "hearts",
   "😂": "laugh", "🥹": "teary", "😌": "calm", "🤩": "starry", "🥳": "party",
   "😴": "sleepy", "🤭": "shy", "🫠": "melt", "🌈": "rainbow", "🥰": "happy",
   "😍": "starry", "🔥": "fire", "🫶": "hug", "😭": "cry", "👀": "eyes",

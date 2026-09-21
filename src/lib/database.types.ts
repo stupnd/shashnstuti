@@ -79,6 +79,13 @@ export type WrappedCustom = {
   updated_at: string;
 };
 
+export type GameSession = {
+  id: string;
+  state: Record<string, unknown>;
+  updated_at: string;
+  updated_by: string | null;
+};
+
 export type LockedLetter = Pick<
   Letter,
   "id" | "title" | "author" | "unlock_at" | "created_at"
@@ -197,6 +204,12 @@ export type Database = {
         Row: WrappedCustom;
         Insert: Optional<WrappedCustom, "label" | "value" | "updated_by" | "updated_at">;
         Update: Partial<WrappedCustom>;
+        Relationships: [];
+      };
+      game_sessions: {
+        Row: GameSession;
+        Insert: Optional<GameSession, "state" | "updated_at" | "updated_by">;
+        Update: Partial<GameSession>;
         Relationships: [];
       };
     };
