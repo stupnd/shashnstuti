@@ -101,18 +101,37 @@ export async function registerPhotos(entryId: string, photos: PhotoRowInput[]): 
   revalidateAll();
 }
 
-export async function removePhoto(photoId: string): Promise<void> {
+export async function removePhoto(
+  photoId: string,
+  opts: { removeEmptyEntry?: boolean } = {},
+): Promise<{ entryDeleted: boolean; entryId: string | null }> {
+  const removeEmptyEntry = opts.removeEmptyEntry !== false;
   const supabase = await createClient();
   const { data: photo } = await supabase
     .from("photos")
-    .select("storage_path")
+    .select("storage_path, entry_id")
     .eq("id", photoId)
     .single();
-  if (!photo) return;
+  if (!photo) return { entryDeleted: false, entryId: null };
+
   await supabase.storage.from("photos").remove([photo.storage_path]);
   const { error } = await supabase.from("photos").delete().eq("id", photoId);
   if (error) throw new Error(error.message);
+
+  if (removeEmptyEntry) {
+    const { count } = await supabase
+      .from("photos")
+      .select("id", { count: "exact", head: true })
+      .eq("entry_id", photo.entry_id);
+    if ((count ?? 0) === 0) {
+      await supabase.from("entries").delete().eq("id", photo.entry_id);
+      revalidateAll();
+      return { entryDeleted: true, entryId: photo.entry_id };
+    }
+  }
+
   revalidateAll();
+  return { entryDeleted: false, entryId: photo.entry_id };
 }
 
 export async function deleteEntry(id: string): Promise<never> {

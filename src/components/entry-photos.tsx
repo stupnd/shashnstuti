@@ -53,7 +53,11 @@ export function EntryPhotos({
       onDelete={
         canEdit
           ? async (id) => {
-              await removePhoto(id);
+              const { entryDeleted } = await removePhoto(id);
+              if (entryDeleted) {
+                router.push("/timeline");
+                return;
+              }
               setList((l) => l.filter((p) => p.id !== id));
               router.refresh();
             }

@@ -102,7 +102,8 @@ export function MomentForm(props: Props) {
 
   async function removeExisting(id: string) {
     if (!confirm("Remove this photo?")) return;
-    await removePhoto(id);
+    // Keep the moment while editing — don't wipe the whole entry if this was the last photo.
+    await removePhoto(id, { removeEmptyEntry: false });
     setExistingPhotos((list) => list.filter((p) => p.id !== id));
   }
 

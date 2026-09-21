@@ -38,6 +38,10 @@ export async function signPhotoUrls(
 const ENTRY_SELECT =
   "*, photos(id, width, height, sort_order, storage_path, caption, date_source), author_profile:profiles!entries_author_fkey(id, display_name, avatar_emoji)";
 
+/** List queries — skip moments with no photos (empty camera tiles). */
+const ENTRY_LIST_SELECT =
+  "*, photos!inner(id, width, height, sort_order, storage_path, caption, date_source), author_profile:profiles!entries_author_fkey(id, display_name, avatar_emoji)";
+
 type RawEntry = Entry & {
   photos: Pick<Photo, "id" | "width" | "height" | "sort_order" | "storage_path" | "caption" | "date_source">[];
   author_profile: Pick<Profile, "id" | "display_name" | "avatar_emoji">;
@@ -66,7 +70,7 @@ export async function fetchEntriesPage(opts: {
 
   let q = supabase
     .from("entries")
-    .select(ENTRY_SELECT)
+    .select(ENTRY_LIST_SELECT)
     .order("date", { ascending: false })
     .order("created_at", { ascending: false })
     .limit(limit + 1);
@@ -82,7 +86,7 @@ export async function fetchEntriesPage(opts: {
   const rows = (data ?? []) as unknown as RawEntry[];
   const hasMore = rows.length > limit;
   const page = hasMore ? rows.slice(0, limit) : rows;
-  const entries = await hydrate(supabase, page);
+  const entries = (await hydrate(supabase, page)).filter((e) => e.photos.length > 0);
   const last = page[page.length - 1];
   return {
     entries,
@@ -117,10 +121,10 @@ export async function fetchOnThisDay(today: string): Promise<EntryCard[]> {
   for (let y = thisYear - 1; y >= thisYear - 15; y--) candidates.push(`${y}-${mm}-${dd}`);
   const { data } = await supabase
     .from("entries")
-    .select(ENTRY_SELECT)
+    .select(ENTRY_LIST_SELECT)
     .in("date", candidates)
     .order("date", { ascending: false });
-  return hydrate(supabase, (data ?? []) as unknown as RawEntry[]);
+  return (await hydrate(supabase, (data ?? []) as unknown as RawEntry[])).filter((e) => e.photos.length > 0);
 }
 
 export async function fetchLatest(limit = 4): Promise<EntryCard[]> {
