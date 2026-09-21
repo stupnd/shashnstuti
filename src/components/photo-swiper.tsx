@@ -86,7 +86,8 @@ export function PhotoSwiper({
   }
 
   return (
-    <div className="relative">
+    <div>
+      <div className="relative">
       <div ref={ref} className="swiper bg-bg-soft" style={{ height: "min(72vh, 640px)" }}>
         {photos.map((p, i) => (
           <div key={p.id} className="flex items-center justify-center" style={{ height: "min(72vh, 640px)" }}>
@@ -125,11 +126,17 @@ export function PhotoSwiper({
           >
             <Icon name="back" size={18} className="rotate-180" />
           </button>
-          <div className="pointer-events-none absolute inset-x-0 bottom-3 flex justify-center gap-1.5">
-            {photos.map((p, i) => (
-              <span key={p.id} className={`h-1.5 rounded-full transition-all ${i === index ? "w-5 bg-ink" : "w-1.5 bg-ink/30"}`} />
-            ))}
-          </div>
+          {count <= 10 ? (
+            <div className="pointer-events-none absolute inset-x-0 bottom-3 flex justify-center gap-1.5">
+              {photos.map((p, i) => (
+                <span key={p.id} className={`h-1.5 rounded-full transition-all ${i === index ? "w-5 bg-ink" : "w-1.5 bg-ink/30"}`} />
+              ))}
+            </div>
+          ) : (
+            <span className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-white/90 px-2.5 py-0.5 text-[11px] font-bold text-ink">
+              {index + 1} / {count}
+            </span>
+          )}
         </>
       )}
 
@@ -155,10 +162,11 @@ export function PhotoSwiper({
         </div>
       )}
 
-      {(current?.caption || count > 1) && (
-        <div className="flex items-baseline justify-between px-1 pt-3">
-          <p className="font-hand text-xl text-ink">{current?.caption ?? ""}</p>
-          {count > 1 && <span className="label">{index + 1} / {count}</span>}
+      </div>
+
+      {current?.caption && (
+        <div className="border-t-2 border-ink bg-white px-4 py-2.5">
+          <p className="font-hand text-xl leading-tight text-ink">{current.caption}</p>
         </div>
       )}
     </div>
