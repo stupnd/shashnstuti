@@ -41,17 +41,22 @@ export function Timeline({
   initialCursor,
   startDate,
   meId,
+  pinnedPhotoIds = [],
 }: {
   initial: EntryCardData[];
   initialCursor: Cursor | null;
   startDate: string;
   meId: string;
+  pinnedPhotoIds?: string[];
 }) {
   const [entries, setEntries] = useState(initial);
   const [cursor, setCursor] = useState(initialCursor);
+  const [pinned, setPinned] = useState(() => new Set(pinnedPhotoIds));
   const [pending, startTransition] = useTransition();
   const sentinel = useRef<HTMLDivElement>(null);
   const root = useReveal([entries.length]);
+
+  useEffect(() => setPinned(new Set(pinnedPhotoIds)), [pinnedPhotoIds]);
 
   // Infinite scroll: when the sentinel shows up, fetch the next page.
   useEffect(() => {
@@ -100,7 +105,18 @@ export function Timeline({
               </Link>
             </header>
             <div className="bento">
-              {ch.entries.map((e) => <EntryTile key={e.id} entry={e} meId={meId} />)}
+              {ch.entries.map((e) => {
+                const coverId = e.photos[0]?.id;
+                return (
+                  <EntryTile
+                    key={e.id}
+                    entry={e}
+                    meId={meId}
+                    showPin={Boolean(coverId)}
+                    coverPinned={coverId ? pinned.has(coverId) : false}
+                  />
+                );
+              })}
             </div>
           </section>
         );

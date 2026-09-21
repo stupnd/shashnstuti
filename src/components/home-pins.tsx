@@ -11,17 +11,21 @@ import { seeded } from "@/lib/seeded";
 import type { HomePinCard, PinBrowsePhoto } from "@/lib/home-pins";
 import { loadMorePinPhotos } from "@/app/(app)/pins/actions";
 
-function PinButton({
+export function PinButton({
   pinned,
   busy,
   onToggle,
   className = "",
+  size = "md",
 }: {
   pinned: boolean;
   busy?: boolean;
   onToggle: () => void;
   className?: string;
+  size?: "sm" | "md";
 }) {
+  const dim = size === "sm" ? "h-8 w-8" : "h-9 w-9";
+  const icon = size === "sm" ? 14 : 16;
   return (
     <button
       type="button"
@@ -33,41 +37,142 @@ function PinButton({
       }}
       aria-pressed={pinned}
       aria-label={pinned ? "Unpin from home" : "Pin to home"}
-      className={`sticker h-9 w-9 transition-transform hover:scale-110 disabled:opacity-100 ${
+      className={`sticker ${dim} transition-transform hover:scale-110 disabled:opacity-100 ${
         pinned ? "bg-accent text-ink ring-2 ring-ink" : "bg-surface text-ink"
       } ${className}`}
     >
-      <Icon name="pushpin" size={16} strokeWidth={2.4} />
+      <Icon name="pushpin" size={icon} strokeWidth={2.4} />
     </button>
   );
 }
 
-/** Single photo tile on home — links to its moment. */
-export function HomePinTile({ pin }: { pin: HomePinCard }) {
+/** Pin / unpin a single photo — used on tiles and the entry viewer. */
+export function PhotoPinButton({
+  photoId,
+  initiallyPinned,
+  size = "md",
+  className = "",
+  onChange,
+}: {
+  photoId: string;
+  initiallyPinned: boolean;
+  size?: "sm" | "md";
+  className?: string;
+  onChange?: (pinned: boolean) => void;
+}) {
+  const router = useRouter();
+  const [pinned, setPinned] = useState(initiallyPinned);
+  const [pending, start] = useTransition();
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => setPinned(initiallyPinned), [photoId, initiallyPinned]);
+
+  return (
+    <span className="relative inline-flex flex-col items-start gap-1">
+      <PinButton
+        pinned={pinned}
+        busy={pending}
+        size={size}
+        className={className}
+        onToggle={() => {
+          setError(null);
+          start(async () => {
+            const next = !pinned;
+            setPinned(next);
+            onChange?.(next);
+            const res = await toggleHomePin(photoId);
+            if ("error" in res) {
+              setPinned(!next);
+              onChange?.(!next);
+              setError(res.error);
+              return;
+            }
+            setPinned(res.pinned);
+            onChange?.(res.pinned);
+            router.refresh();
+          });
+        }}
+      />
+      {error && (
+        <span className="pill max-w-[11rem] px-2 py-1 text-[10px] font-semibold text-accent" role="alert">
+          {error}
+        </span>
+      )}
+    </span>
+  );
+}
+
+/** Fridge tile on home — tap the pin to unpin. */
+export function HomePinTile({
+  pin,
+  onUnpinned,
+}: {
+  pin: HomePinCard;
+  onUnpinned?: (photoId: string) => void;
+}) {
   const color = PASTELS[Math.abs(Math.round(seeded(pin.photoId, 5) * 10)) % PASTELS.length];
   const tilt = seeded(pin.photoId, 9) * 2.2;
   const caption = pin.caption || pin.title || formatShortDate(pin.date);
   const ratio = pin.width / pin.height;
-  const span =
-    ratio < 0.7 ? "row-span-2" : ratio > 1.3 ? "col-span-2" : "";
+  const span = ratio < 0.7 ? "row-span-2" : ratio > 1.3 ? "col-span-2" : "";
 
   return (
-    <Link
-      href={`/entry/${pin.entryId}`}
-      transitionTypes={["nav-forward"]}
-      className={`tile ${span}`}
-      style={{ "--tile": color, "--tilt": `${tilt}deg` } as CSSProperties}
-    >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={pin.url} alt={caption} loading="lazy" style={{ objectPosition: "50% 30%" }} />
-      <span className="absolute right-2 top-2 sticker h-8 w-8 bg-accent text-ink ring-2 ring-ink">
-        <Icon name="pushpin" size={14} strokeWidth={2.4} />
-      </span>
-      <div className="tile-strip">
-        <p className="font-hand line-clamp-1 text-lg leading-tight text-ink">{caption}</p>
-        <p className="mt-0.5 text-[9px] font-bold uppercase tracking-[0.18em] text-muted">{formatShortDate(pin.date)}</p>
+    <div className={`relative ${span}`}>
+      <Link
+        href={`/entry/${pin.entryId}`}
+        transitionTypes={["nav-forward"]}
+        className="tile block h-full min-h-[9rem]"
+        style={{ "--tile": color, "--tilt": `${tilt}deg` } as CSSProperties}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={pin.url} alt={caption} loading="lazy" style={{ objectPosition: "50% 30%" }} />
+        <div className="tile-strip">
+          <p className="font-hand line-clamp-1 text-lg leading-tight text-ink">{caption}</p>
+          <p className="mt-0.5 text-[9px] font-bold uppercase tracking-[0.18em] text-muted">{formatShortDate(pin.date)}</p>
+        </div>
+      </Link>
+      <div className="absolute right-2 top-2 z-10">
+        <PhotoPinButton
+          photoId={pin.photoId}
+          initiallyPinned
+          size="sm"
+          className="!shadow-[2px_2px_0_var(--ink)]"
+          onChange={(pinned) => {
+            if (!pinned) onUnpinned?.(pin.photoId);
+          }}
+        />
       </div>
-    </Link>
+    </div>
+  );
+}
+
+/** Home fridge grid with live unpin. */
+export function HomePinsGrid({ initial }: { initial: HomePinCard[] }) {
+  const [pins, setPins] = useState(initial);
+  useEffect(() => setPins(initial), [initial]);
+
+  if (pins.length === 0) {
+    return (
+      <Link
+        href="/pins"
+        transitionTypes={["nav-forward"]}
+        className="dashed flex flex-col items-center gap-2 px-4 py-10 text-center transition-transform hover:-translate-y-0.5"
+      >
+        <span className="sticker h-14 w-14 bg-peach text-ink">
+          <Icon name="pushpin" size={24} />
+        </span>
+        <p className="font-marker text-2xl leading-tight">pin your favorites</p>
+        <p className="max-w-xs text-sm text-muted">go through photos and pushpin the ones you want on home</p>
+      </Link>
+    );
+  }
+
+  return (
+    <div className="bento">
+      {pins.map((p) => (
+        <HomePinTile key={p.photoId} pin={p} onUnpinned={(id) => setPins((list) => list.filter((x) => x.photoId !== id))} />
+      ))}
+    </div>
   );
 }
 
@@ -189,42 +294,7 @@ export function PinPicker({
   );
 }
 
-/** Pin control for the entry photo swiper. */
-export function EntryPinButton({ photoId, initiallyPinned }: { photoId: string; initiallyPinned: boolean }) {
-  const router = useRouter();
-  const [pinned, setPinned] = useState(initiallyPinned);
-  const [pending, start] = useTransition();
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => setPinned(initiallyPinned), [photoId, initiallyPinned]);
-
-  return (
-    <span className="relative inline-flex flex-col items-end gap-1">
-      <PinButton
-        pinned={pinned}
-        busy={pending}
-        className="!shadow-[2px_2px_0_var(--ink)]"
-        onToggle={() => {
-          setError(null);
-          start(async () => {
-            const next = !pinned;
-            setPinned(next);
-            const res = await toggleHomePin(photoId);
-            if ("error" in res) {
-              setPinned(!next);
-              setError(res.error);
-              return;
-            }
-            setPinned(res.pinned);
-            router.refresh();
-          });
-        }}
-      />
-      {error && (
-        <span className="pill max-w-[11rem] px-2 py-1 text-[10px] font-semibold text-accent" role="alert">
-          {error}
-        </span>
-      )}
-    </span>
-  );
+/** @deprecated use PhotoPinButton */
+export function EntryPinButton(props: { photoId: string; initiallyPinned: boolean }) {
+  return <PhotoPinButton {...props} className="!shadow-[2px_2px_0_var(--ink)]" />;
 }

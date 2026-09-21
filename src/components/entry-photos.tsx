@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 import { movePhotoToDate, removePhoto } from "@/lib/actions/entries";
 import type { Neighbor, PhotoWithUrl } from "@/lib/entries";
-import { EntryPinButton } from "./home-pins";
+import { PhotoPinButton } from "./home-pins";
 import { PhotoSwiper } from "./photo-swiper";
 
 /** Entry-page viewer; wires the delete button to the server action for the author. */
@@ -30,7 +30,11 @@ export function EntryPhotos({
   useEffect(() => setPinned(new Set(pinnedIds)), [pinnedIds]);
 
   const extraActions = (photo: PhotoWithUrl): ReactNode => (
-    <EntryPinButton photoId={photo.id} initiallyPinned={pinned.has(photo.id)} />
+    <PhotoPinButton
+      photoId={photo.id}
+      initiallyPinned={pinned.has(photo.id)}
+      className="!shadow-[2px_2px_0_var(--ink)]"
+    />
   );
 
   return (

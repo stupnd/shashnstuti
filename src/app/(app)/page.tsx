@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Confetti } from "@/components/confetti";
 import { EntryTile } from "@/components/entry-tile";
-import { HomePinTile } from "@/components/home-pins";
+import { HomePinsGrid } from "@/components/home-pins";
 import { Icon, type IconName } from "@/components/icons";
 import { ThemeToggle } from "@/components/theme";
 import { ThoughtsBoard } from "@/components/thoughts-board";
@@ -100,25 +100,7 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          {pins.length > 0 ? (
-            <div className="bento">
-              {pins.map((p) => (
-                <HomePinTile key={p.photoId} pin={p} />
-              ))}
-            </div>
-          ) : (
-            <Link
-              href="/pins"
-              transitionTypes={["nav-forward"]}
-              className="dashed flex flex-col items-center gap-2 px-4 py-10 text-center transition-transform hover:-translate-y-0.5"
-            >
-              <span className="sticker h-14 w-14 bg-peach text-ink">
-                <Icon name="pushpin" size={24} />
-              </span>
-              <p className="font-marker text-2xl leading-tight">pin your favorites</p>
-              <p className="max-w-xs text-sm text-muted">go through photos and pushpin the ones you want on home</p>
-            </Link>
-          )}
+          <HomePinsGrid initial={pins} />
         </section>
 
         {memory && (
