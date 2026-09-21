@@ -2,11 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Icon, iconFor } from "@/components/icons";
+import { DateEditor } from "@/components/date-editor";
 import { EntryPhotos } from "@/components/entry-photos";
 import { Reactions } from "@/components/reactions";
 import { Avatar, Page } from "@/components/ui";
 import { getCurrentProfile } from "@/lib/data";
-import { formatLongDate } from "@/lib/dates";
+
 import { fetchEntry, fetchReactions } from "@/lib/entries";
 
 export const metadata: Metadata = { title: "moment" };
@@ -33,10 +34,15 @@ export default async function EntryPage({ params }: PageProps<"/entry/[id]">) {
 
       <article className="mt-6 space-y-6">
         <header>
-          <p className="label">
-            {formatLongDate(entry.date)}
-            {entry.place && <> · {entry.place}</>}
-          </p>
+          <div className="label flex flex-wrap items-center gap-2">
+            <DateEditor
+              id={entry.id}
+              date={entry.date}
+              canEdit={mine}
+              unsure={entry.photos.length > 0 && entry.photos.every((p) => p.date_source === "mtime")}
+            />
+            {entry.place && <span>· {entry.place}</span>}
+          </div>
           {entry.title && <h1 className="font-marker mt-2 text-3xl leading-tight">{entry.title}</h1>}
           {entry.is_milestone && (
             <p className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-accent"><Icon name="sparkle" size={14} /> milestone</p>

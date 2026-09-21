@@ -13,16 +13,22 @@ export function PhotoSwiper({
   photos,
   alt,
   onDelete,
+  onMove,
 }: {
   photos: PhotoWithUrl[];
   alt: string;
   /** When given, the author can delete the photo they're looking at. */
   onDelete?: (photoId: string) => Promise<void>;
+  /** When given, the author can move the current photo to another date. */
+  onMove?: (photoId: string, date: string) => Promise<void>;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(0);
   const [confirming, setConfirming] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [moving, setMoving] = useState(false);
+  const [moveDate, setMoveDate] = useState("");
+  const [busy, setBusy] = useState(false);
   const count = photos.length;
 
   useEffect(() => {
@@ -140,15 +146,40 @@ export function PhotoSwiper({
         </>
       )}
 
-      {onDelete && !confirming && (
-        <button
-          type="button"
-          onClick={() => setConfirming(true)}
-          aria-label="Delete this photo"
-          className="pill absolute right-3 top-3 flex h-9 w-9 items-center justify-center text-muted hover:text-accent"
-        >
-          <Icon name="trash" size={17} />
-        </button>
+      {(onDelete || onMove) && !confirming && !moving && (
+        <div className="absolute right-3 top-3 flex gap-2">
+          {onMove && (
+            <button type="button" onClick={() => setMoving(true)} aria-label="Move this photo to another date" className="pill flex h-9 w-9 items-center justify-center text-muted hover:text-ink">
+              <Icon name="edit" size={16} />
+            </button>
+          )}
+          {onDelete && (
+            <button type="button" onClick={() => setConfirming(true)} aria-label="Delete this photo" className="pill flex h-9 w-9 items-center justify-center text-muted hover:text-accent">
+              <Icon name="trash" size={17} />
+            </button>
+          )}
+        </div>
+      )}
+      {moving && (
+        <div className="pill absolute inset-x-3 top-3 flex flex-wrap items-center justify-between gap-2 py-2 pl-4 pr-2 text-sm">
+          <span className="font-semibold">move this photo to</span>
+          <span className="flex items-center gap-1">
+            <input type="date" value={moveDate} onChange={(e) => setMoveDate(e.target.value)} className="input w-auto py-1 text-sm" autoFocus />
+            <button type="button" onClick={() => setMoving(false)} disabled={busy} className="btn btn-ghost py-1.5">cancel</button>
+            <button
+              type="button"
+              disabled={busy || !moveDate}
+              onClick={async () => {
+                if (!onMove || !current) return;
+                setBusy(true);
+                try { await onMove(current.id, moveDate); } finally { setBusy(false); setMoving(false); }
+              }}
+              className="btn btn-primary py-1.5"
+            >
+              {busy ? "moving…" : "move"}
+            </button>
+          </span>
+        </div>
       )}
       {confirming && (
         <div className="pill absolute inset-x-3 top-3 flex items-center justify-between gap-2 py-2 pl-4 pr-2 text-sm">

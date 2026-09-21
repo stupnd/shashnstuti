@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { removePhoto } from "@/lib/actions/entries";
+import { movePhotoToDate, removePhoto } from "@/lib/actions/entries";
 import type { PhotoWithUrl } from "@/lib/entries";
 import { PhotoSwiper } from "./photo-swiper";
 
@@ -21,6 +21,16 @@ export function EntryPhotos({ photos, alt, canEdit }: { photos: PhotoWithUrl[]; 
               await removePhoto(id);
               setList((l) => l.filter((p) => p.id !== id));
               router.refresh();
+            }
+          : undefined
+      }
+      onMove={
+        canEdit
+          ? async (id, date) => {
+              const { entryId } = await movePhotoToDate(id, date);
+              setList((l) => l.filter((p) => p.id !== id));
+              if (list.length <= 1) router.push(`/entry/${entryId}`);
+              else router.refresh();
             }
           : undefined
       }

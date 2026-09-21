@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import type { Entry, Photo, Profile, Reaction } from "@/lib/database.types";
 
-export type PhotoWithUrl = Pick<Photo, "id" | "width" | "height" | "sort_order" | "storage_path" | "caption"> & {
+export type PhotoWithUrl = Pick<Photo, "id" | "width" | "height" | "sort_order" | "storage_path" | "caption" | "date_source"> & {
   url: string;
 };
 
@@ -36,10 +36,10 @@ export async function signPhotoUrls(
 }
 
 const ENTRY_SELECT =
-  "*, photos(id, width, height, sort_order, storage_path, caption), author_profile:profiles!entries_author_fkey(id, display_name, avatar_emoji)";
+  "*, photos(id, width, height, sort_order, storage_path, caption, date_source), author_profile:profiles!entries_author_fkey(id, display_name, avatar_emoji)";
 
 type RawEntry = Entry & {
-  photos: Pick<Photo, "id" | "width" | "height" | "sort_order" | "storage_path" | "caption">[];
+  photos: Pick<Photo, "id" | "width" | "height" | "sort_order" | "storage_path" | "caption" | "date_source">[];
   author_profile: Pick<Profile, "id" | "display_name" | "avatar_emoji">;
 };
 
