@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Confetti } from "@/components/confetti";
 import { EntryTile } from "@/components/entry-tile";
 import { Icon, type IconName } from "@/components/icons";
+import { ThemeToggle } from "@/components/theme";
 import { Avatar, Page, PageHeader } from "@/components/ui";
 import { getCurrentProfile, getPartner, getSettings } from "@/lib/data";
 import { dayOfUs, formatLongDate, formatShortDate, nextAnniversary, todayDateOnly } from "@/lib/dates";
@@ -13,7 +14,7 @@ function ActionCard({ href, icon, color, children }: { href: string; icon: IconN
       href={href}
       transitionTypes={["nav-forward"]}
       prefetch={href === "/random" ? false : undefined}
-      className="card flex flex-col items-start justify-between p-4 transition-transform hover:-translate-y-1 hover:-rotate-1"
+      className="card jelly flex flex-col items-start justify-between p-4 transition-transform hover:-translate-y-1 hover:-rotate-1"
       style={{ "--card-shadow": color } as React.CSSProperties}
     >
       <span className="sticker h-10 w-10" style={{ background: color }}><Icon name={icon} size={20} strokeWidth={2} /></span>
@@ -47,23 +48,26 @@ export default async function HomePage() {
           caption={`since ${formatShortDate(settings.start_date)}`}
           hl="var(--pink)"
           action={
-            <Link href="/settings" transitionTypes={["nav-forward"]} aria-label="Settings" className="btn btn-ghost h-11 w-11 rounded-full p-0">
-              <Icon name="gear" size={22} />
-            </Link>
+            <span className="flex items-center gap-1">
+              <ThemeToggle />
+              <Link href="/settings" transitionTypes={["nav-forward"]} aria-label="Settings" className="btn btn-ghost h-11 w-11 rounded-full p-0">
+                <Icon name="gear" size={22} />
+              </Link>
+            </span>
           }
         />
 
         <div className="mt-4 flex items-center gap-2 text-sm font-medium text-muted">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-pink px-2.5 py-1 text-ink"><Avatar value={me.avatar_emoji} size={15} /> {me.display_name}</span>
-          <Icon name="heartFilled" size={14} className="text-accent" />
+          <span className="shimmy inline-flex items-center gap-1.5 rounded-full bg-pink px-2.5 py-1 text-ink"><Avatar value={me.avatar_emoji} size={15} /> {me.display_name}</span>
+          <Icon name="heartFilled" size={14} className="heartbeat text-accent" />
           {partner ? (
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-sky px-2.5 py-1 text-ink"><Avatar value={partner.avatar_emoji} size={15} /> {partner.display_name}</span>
+            <span className="shimmy inline-flex items-center gap-1.5 rounded-full bg-sky px-2.5 py-1 text-ink" style={{ animationDelay: "0.6s" }}><Avatar value={partner.avatar_emoji} size={15} /> {partner.display_name}</span>
           ) : (
             <span>waiting for shash…</span>
           )}
         </div>
 
-        <section className="card mt-7 p-5" style={{ "--card-shadow": isAnniversary ? "var(--accent)" : "var(--butter)" } as React.CSSProperties}>
+        <section className={`card mt-7 p-5 ${isAnniversary ? "soft-glow" : "shimmy"}`} style={{ "--card-shadow": isAnniversary ? "var(--accent)" : "var(--butter)", animationDuration: isAnniversary ? undefined : "6s" } as React.CSSProperties}>
           <p className="label">{isAnniversary ? "today!!!" : "next anniversary"}</p>
           <p className="font-marker mt-1 text-4xl leading-tight">
             {isAnniversary ? `happy ${anniversary.years} years` : `${anniversary.daysUntil} days`}
@@ -73,10 +77,10 @@ export default async function HomePage() {
           </p>
         </section>
 
-        <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-4">
+        <div className="stagger-in mt-5 grid grid-cols-2 gap-4 sm:grid-cols-4">
           <ActionCard href="/watch" icon="sparkle" color="var(--sky)">watch<br />our story</ActionCard>
           <ActionCard href="/ask" icon="eyes" color="var(--lilac)">ask<br />the book</ActionCard>
-          <ActionCard href="/random" icon="dice" color="var(--mint)">random<br />memory</ActionCard>
+          <ActionCard href="/flip" icon="heart" color="var(--mint)">flip<br />through us</ActionCard>
           <ActionCard href="/new" icon="camera" color="var(--peach)">add a<br />moment</ActionCard>
         </div>
 

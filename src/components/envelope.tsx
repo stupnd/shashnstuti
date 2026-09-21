@@ -57,7 +57,7 @@ export function Envelope({ id, title, from, state, unlockAt }: Props) {
       className={`envelope group block w-full text-left ${opening ? "opening" : ""} ${state === "locked" ? "cursor-default" : ""}`}
     >
       <div className={`relative aspect-[3/2] w-full overflow-hidden rounded-2xl border border-line ${paper} shadow-[var(--shadow-card)]`}>
-        <div className="envelope-letter absolute inset-x-4 bottom-0 top-3 rounded-t-lg border border-line bg-white">
+        <div className="envelope-letter absolute inset-x-4 bottom-0 top-3 rounded-t-lg border border-line bg-surface">
           <p className="font-hand px-3 pt-2 text-lg text-muted">{title}</p>
         </div>
         <div className={`absolute inset-x-0 bottom-0 h-[62%] border-t border-line ${paper}`} style={{ clipPath: "polygon(0 0, 50% 45%, 100% 0, 100% 100%, 0 100%)" }} />

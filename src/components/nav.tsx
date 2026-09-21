@@ -21,7 +21,7 @@ function Tab({ href, label, icon, color, active }: { href: string; label: string
       href={href}
       aria-label={label}
       aria-current={active ? "page" : undefined}
-      className="flex h-12 w-12 flex-col items-center justify-center gap-0.5 rounded-2xl transition-transform hover:-translate-y-0.5"
+      className={`flex h-12 w-12 flex-col items-center justify-center gap-0.5 rounded-2xl transition-transform hover:-translate-y-0.5 hover:rotate-[-3deg] ${active ? "nav-active" : ""}`}
       style={{ background: active ? color : "transparent", color: active ? "var(--ink)" : "var(--muted)" } as CSSProperties}
     >
       <Icon name={icon} size={20} strokeWidth={active ? 2.2 : 1.7} />
@@ -34,7 +34,7 @@ function Tab({ href, label, icon, color, active }: { href: string; label: string
 export function Nav() {
   const pathname = usePathname();
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
-  if (pathname.startsWith("/wrapped/") || pathname.startsWith("/watch")) return null;
+  if (pathname.startsWith("/wrapped/") || pathname.startsWith("/watch") || pathname.startsWith("/flip")) return null;
 
   return (
     <nav

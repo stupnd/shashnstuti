@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ThemeToggle } from "@/components/theme";
 import { Page, PageHeader } from "@/components/ui";
 import { getCurrentProfile, getSettings } from "@/lib/data";
 import { ProfileForm, StartDateForm } from "./forms";
@@ -14,6 +15,17 @@ export default async function SettingsPage() {
       <PageHeader back="/" title="settings" caption="the boring but useful page" hl="var(--lilac)" />
 
       <div className="mt-6 space-y-4">
+        <section className="card p-5" style={{ "--card-shadow": "var(--butter)" } as React.CSSProperties}>
+          <p className="label mb-3">look &amp; feel</p>
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="font-marker text-xl leading-tight">day or night?</p>
+              <p className="mt-1 text-sm text-muted">cozy cream paper or soft scrapbook midnight.</p>
+            </div>
+            <ThemeToggle label />
+          </div>
+        </section>
+
         <section className="card p-5" style={{ "--card-shadow": "var(--pink)" } as React.CSSProperties}>
           <p className="label mb-4">you</p>
           <ProfileForm profile={me} />

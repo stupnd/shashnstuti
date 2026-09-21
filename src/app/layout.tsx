@@ -1,7 +1,10 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import { Caveat, Fredoka, Gochi_Hand } from "next/font/google";
 import { RoughFilter } from "@/components/icons";
 import { ServiceWorkerRegister } from "@/components/sw-register";
+import { ThemeProvider } from "@/components/theme";
+import { THEME_INIT_SCRIPT } from "@/lib/theme-script";
 import "./globals.css";
 
 const fredoka = Fredoka({ variable: "--font-fredoka", subsets: ["latin"], display: "swap" });
@@ -20,7 +23,10 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#fff8ef",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#fff8ef" },
+    { media: "(prefers-color-scheme: dark)", color: "#16121c" },
+  ],
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -28,11 +34,14 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${fredoka.variable} ${caveat.variable} ${gochi.variable} h-full`}>
-      <body className="min-h-full flex flex-col antialiased">
-        <RoughFilter />
-        {children}
-        <ServiceWorkerRegister />
+    <html lang="en" className={`${fredoka.variable} ${caveat.variable} ${gochi.variable} h-full`} suppressHydrationWarning>
+      <body className="relative min-h-full flex flex-col antialiased">
+        <Script id="theme-init" strategy="beforeInteractive" dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+        <ThemeProvider>
+          <RoughFilter />
+          {children}
+          <ServiceWorkerRegister />
+        </ThemeProvider>
       </body>
     </html>
   );

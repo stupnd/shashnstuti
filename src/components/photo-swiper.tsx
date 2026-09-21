@@ -165,7 +165,7 @@ export function PhotoSwiper({
               ))}
             </div>
           ) : (
-            <span className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-white/90 px-2.5 py-0.5 text-[11px] font-bold text-ink">
+            <span className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-surface/90 px-2.5 py-0.5 text-[11px] font-bold text-ink">
               {index + 1} / {count}
             </span>
           )}
@@ -222,7 +222,7 @@ export function PhotoSwiper({
       </div>
 
       {current?.caption && (
-        <div className="border-t-2 border-ink bg-white px-4 py-2.5">
+        <div className="border-t-2 border-ink bg-surface px-4 py-2.5">
           <p className="font-hand text-xl leading-tight text-ink">{current.caption}</p>
         </div>
       )}

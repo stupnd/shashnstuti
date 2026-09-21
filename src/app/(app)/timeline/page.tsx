@@ -24,7 +24,10 @@ export default async function TimelinePage() {
           hl="var(--mint)"
           action={
             <span className="flex gap-2">
-              <Link href="/ask" transitionTypes={["nav-forward"]} aria-label="Ask the book" className="btn btn-soft h-11 w-11 rounded-full p-0">
+              <Link href="/flip" transitionTypes={["nav-forward"]} aria-label="Flip through" className="btn btn-soft h-11 w-11 rounded-full p-0">
+                <Icon name="heart" size={20} />
+              </Link>
+              <Link href="/ask" transitionTypes={["nav-forward"]} aria-label="Ask the book" className="btn btn-sky h-11 w-11 rounded-full p-0">
                 <Icon name="eyes" size={20} />
               </Link>
               <Link href="/random" prefetch={false} aria-label="Random memory" className="btn btn-mint h-11 w-11 rounded-full p-0">
