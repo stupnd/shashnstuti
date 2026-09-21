@@ -3,36 +3,40 @@ import { Confetti } from "@/components/confetti";
 import { EntryTile } from "@/components/entry-tile";
 import { Icon, type IconName } from "@/components/icons";
 import { ThemeToggle } from "@/components/theme";
-import { Avatar, Page, PageHeader } from "@/components/ui";
+import { ThoughtsBoard } from "@/components/thoughts-board";
+import { Avatar, Page, PageHeader, Squiggle } from "@/components/ui";
 import { getCurrentProfile, getPartner, getSettings } from "@/lib/data";
 import { dayOfUs, formatLongDate, formatShortDate, nextAnniversary, todayDateOnly } from "@/lib/dates";
 import { fetchLatest, fetchOnThisDay } from "@/lib/entries";
 import { fetchUnopenedLetters } from "@/lib/letters";
+import { fetchThoughts } from "@/lib/thoughts";
 
-function ActionCard({ href, icon, color, children }: { href: string; icon: IconName; color: string; children: React.ReactNode }) {
+function Shortcut({ href, icon, color, label }: { href: string; icon: IconName; color: string; label: string }) {
   return (
     <Link
       href={href}
       transitionTypes={["nav-forward"]}
-      prefetch={href === "/random" ? false : undefined}
-      className="card flex flex-col items-start justify-between p-4 transition-transform hover:-translate-y-1 hover:-rotate-1"
-      style={{ "--card-shadow": color } as React.CSSProperties}
+      className="flex flex-col items-center gap-1.5 rounded-2xl border-2 border-ink bg-surface px-2 py-3 text-center shadow-[3px_3px_0_var(--chip)] transition-transform hover:-translate-y-1 hover:-rotate-2"
+      style={{ ["--chip" as string]: color }}
     >
-      <span className="sticker h-10 w-10" style={{ background: color }}><Icon name={icon} size={20} strokeWidth={2} /></span>
-      <span className="mt-5 text-sm font-semibold leading-tight">{children}</span>
+      <span className="sticker h-9 w-9" style={{ background: color }}>
+        <Icon name={icon} size={18} strokeWidth={2} />
+      </span>
+      <span className="text-[11px] font-bold leading-tight">{label}</span>
     </Link>
   );
 }
 
 export default async function HomePage() {
   const today = todayDateOnly();
-  const [me, partner, settings, onThisDay, latest, unopened] = await Promise.all([
+  const [me, partner, settings, onThisDay, latest, unopened, thoughts] = await Promise.all([
     getCurrentProfile(),
     getPartner(),
     getSettings(),
     fetchOnThisDay(today),
     fetchLatest(6),
     fetchUnopenedLetters(),
+    fetchThoughts(),
   ]);
 
   const day = dayOfUs(settings.start_date);
@@ -60,14 +64,28 @@ export default async function HomePage() {
           }
         />
 
-        <div className="mt-4 flex items-center gap-2 text-sm font-medium text-muted">
-          <span className="shimmy inline-flex items-center gap-1.5 rounded-full bg-pink px-2.5 py-1 text-ink"><Avatar value={me.avatar_emoji} size={15} /> {me.display_name}</span>
-          <Icon name="heartFilled" size={14} className="heartbeat text-accent" />
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <span className="shimmy inline-flex items-center gap-1.5 rounded-full border-2 border-ink bg-pink px-2.5 py-1 text-sm font-medium text-ink">
+            <Avatar value={me.avatar_emoji} size={15} /> {me.display_name}
+          </span>
+          <Icon name="heartFilled" size={16} className="heartbeat text-accent" />
           {partner ? (
-            <span className="shimmy inline-flex items-center gap-1.5 rounded-full bg-sky px-2.5 py-1 text-ink" style={{ animationDelay: "0.6s" }}><Avatar value={partner.avatar_emoji} size={15} /> {partner.display_name}</span>
+            <span className="shimmy inline-flex items-center gap-1.5 rounded-full border-2 border-ink bg-sky px-2.5 py-1 text-sm font-medium text-ink" style={{ animationDelay: "0.6s" }}>
+              <Avatar value={partner.avatar_emoji} size={15} /> {partner.display_name}
+            </span>
           ) : (
-            <span>waiting for shash…</span>
+            <span className="text-sm text-muted">waiting for shash…</span>
           )}
+        </div>
+
+        <Squiggle className="mt-4 w-40 opacity-60" color="var(--accent)" />
+
+        <div className="mt-5">
+          <ThoughtsBoard
+            initial={thoughts}
+            me={{ id: me.id, display_name: me.display_name, avatar_emoji: me.avatar_emoji }}
+            partner={partner ? { id: partner.id, display_name: partner.display_name, avatar_emoji: partner.avatar_emoji } : null}
+          />
         </div>
 
         {topLetter && (
@@ -75,9 +93,9 @@ export default async function HomePage() {
             href="/letters"
             transitionTypes={["nav-forward"]}
             className="card soft-glow mt-5 flex items-center gap-3 p-4 transition-transform hover:-translate-y-0.5"
-            style={{ "--card-shadow": "var(--pink)" } as React.CSSProperties}
+            style={{ ["--card-shadow" as string]: "var(--lilac)" }}
           >
-            <span className="sticker bob h-12 w-12 shrink-0 bg-pink text-accent">
+            <span className="sticker bob h-12 w-12 shrink-0 bg-lilac text-accent">
               <Icon name="envelope" size={22} strokeWidth={2} />
             </span>
             <span className="min-w-0 flex-1">
@@ -91,27 +109,40 @@ export default async function HomePage() {
           </Link>
         )}
 
-        <section className={`card mt-7 p-5 ${isAnniversary ? "soft-glow" : "shimmy"}`} style={{ "--card-shadow": isAnniversary ? "var(--accent)" : "var(--butter)", animationDuration: isAnniversary ? undefined : "6s" } as React.CSSProperties}>
-          <p className="label">{isAnniversary ? "today!!!" : "next anniversary"}</p>
-          <p className="font-marker mt-1 text-4xl leading-tight">
-            {isAnniversary ? `happy ${anniversary.years} years` : `${anniversary.daysUntil} days`}
-          </p>
-          <p className="mt-1 text-sm text-muted">
-            {isAnniversary ? "to us. go celebrate." : `until ${anniversary.years} years · ${formatLongDate(anniversary.date)}`}
-          </p>
+        <section
+          className={`mt-5 flex items-center justify-between gap-3 rounded-[1.4rem] border-2 border-ink px-4 py-3 ${isAnniversary ? "soft-glow bg-accent-soft" : "bg-butter"}`}
+          style={{ boxShadow: `4px 4px 0 ${isAnniversary ? "var(--accent)" : "var(--peach)"}` }}
+        >
+          <div className="min-w-0">
+            <p className="label">{isAnniversary ? "today!!!" : "next anniversary"}</p>
+            <p className="font-marker text-2xl leading-tight sm:text-3xl">
+              {isAnniversary ? `happy ${anniversary.years} years` : `${anniversary.daysUntil} days to go`}
+            </p>
+            {!isAnniversary && (
+              <p className="truncate text-xs text-muted">{formatLongDate(anniversary.date)} · {anniversary.years} years</p>
+            )}
+          </div>
+          <span className="sticker h-11 w-11 shrink-0 bg-surface text-accent">
+            <Icon name={isAnniversary ? "party" : "sparkle"} size={20} />
+          </span>
         </section>
 
-        <div className="stagger-in mt-5 grid grid-cols-2 gap-4 sm:grid-cols-4">
-          <ActionCard href="/watch" icon="sparkle" color="var(--sky)">watch<br />our story</ActionCard>
-          <ActionCard href="/ask" icon="eyes" color="var(--lilac)">ask<br />the book</ActionCard>
-          <ActionCard href="/flip" icon="heart" color="var(--mint)">flip<br />through us</ActionCard>
-          <ActionCard href="/play" icon="dice" color="var(--butter)">play<br />a game</ActionCard>
-        </div>
+        <section className="mt-6">
+          <p className="label mb-3">play &amp; peek</p>
+          <div className="stagger-in grid grid-cols-4 gap-2.5">
+            <Shortcut href="/watch" icon="sparkle" color="var(--sky)" label="watch" />
+            <Shortcut href="/flip" icon="heart" color="var(--mint)" label="flip" />
+            <Shortcut href="/play" icon="dice" color="var(--butter)" label="play" />
+            <Shortcut href="/ask" icon="eyes" color="var(--lilac)" label="ask" />
+          </div>
+        </section>
 
         {memory && (
           <section className="mt-10">
             <div className="mb-3 flex items-baseline justify-between">
-              <h2 className="font-marker text-2xl"><span className="hl" style={{ "--hl": "var(--sky)" } as React.CSSProperties}>on this day</span></h2>
+              <h2 className="font-marker text-2xl">
+                <span className="hl" style={{ ["--hl" as string]: "var(--sky)" }}>on this day</span>
+              </h2>
               <span className="label">{formatShortDate(memory.date)}</span>
             </div>
             <div className="bento">
@@ -123,14 +154,20 @@ export default async function HomePage() {
 
         <section className="mt-10">
           <div className="mb-3 flex items-baseline justify-between">
-            <h2 className="font-marker text-2xl"><span className="hl" style={{ "--hl": "var(--mint)" } as React.CSSProperties}>latest pages</span></h2>
-            <Link href="/timeline" transitionTypes={["nav-forward"]} className="label hover:text-ink">open the book →</Link>
+            <h2 className="font-marker text-2xl">
+              <span className="hl" style={{ ["--hl" as string]: "var(--mint)" }}>latest pages</span>
+            </h2>
+            <Link href="/timeline" transitionTypes={["nav-forward"]} className="label hover:text-ink">
+              open the book →
+            </Link>
           </div>
           {latest.length === 0 ? (
             <p className="text-sm text-muted">nothing here yet — tap + to add your first moment.</p>
           ) : (
             <div className="bento">
-              {latest.map((e) => <EntryTile key={e.id} entry={e} meId={me.id} reveal={false} />)}
+              {latest.map((e) => (
+                <EntryTile key={e.id} entry={e} meId={me.id} reveal={false} />
+              ))}
             </div>
           )}
         </section>
