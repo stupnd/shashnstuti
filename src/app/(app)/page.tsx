@@ -61,20 +61,18 @@ export default async function HomePage() {
           title={<>day {day.toLocaleString()} of us</>}
           caption={`since ${formatShortDate(settings.start_date)}`}
           hl="var(--pink)"
-          action={
-            <span className="flex items-center gap-1">
-              <ThemeToggle />
-              <Link href="/settings" transitionTypes={["nav-forward"]} aria-label="Settings" className="btn btn-ghost h-11 w-11 rounded-full p-0">
-                <Icon name="gear" size={22} />
-              </Link>
-            </span>
-          }
+          action={<ThemeToggle />}
         />
 
         <div className="mt-3 flex flex-wrap items-center gap-2">
-          <span className="shimmy inline-flex items-center gap-1.5 rounded-full border-2 border-ink bg-pink px-2.5 py-1 text-sm font-medium text-ink">
+          <Link
+            href="/settings"
+            transitionTypes={["nav-forward"]}
+            className="shimmy inline-flex items-center gap-1.5 rounded-full border-2 border-ink bg-pink px-2.5 py-1 text-sm font-medium text-ink"
+            aria-label="Settings"
+          >
             <Avatar value={me.avatar_emoji} size={15} /> {me.display_name}
-          </span>
+          </Link>
           <Icon name="heartFilled" size={16} className="heartbeat text-accent" />
           {partner ? (
             <span className="shimmy inline-flex items-center gap-1.5 rounded-full border-2 border-ink bg-sky px-2.5 py-1 text-sm font-medium text-ink" style={{ animationDelay: "0.6s" }}>
