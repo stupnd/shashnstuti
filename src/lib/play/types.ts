@@ -1,7 +1,6 @@
 import type { IconName } from "@/components/icons";
 
-export type GameId = "ttt" | "connect4" | "memory";
-export type PlayMode = "pass" | "online";
+export type GameId = "ttt" | "connect4" | "dots" | "showdown";
 export type Seat = "a" | "b";
 
 export type GameMeta = {
@@ -28,11 +27,18 @@ export const GAMES: GameMeta[] = [
     color: "var(--sky)",
   },
   {
-    id: "memory",
-    title: "memory",
-    blurb: "flip pairs. most wins.",
-    icon: "eyes",
+    id: "dots",
+    title: "dots & boxes",
+    blurb: "claim lines. steal boxes.",
+    icon: "sparkle",
     color: "var(--mint)",
+  },
+  {
+    id: "showdown",
+    title: "showdown",
+    blurb: "rock · paper · scissors. first to 3.",
+    icon: "fire",
+    color: "var(--peach)",
   },
 ];
 

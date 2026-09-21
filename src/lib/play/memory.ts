@@ -65,6 +65,7 @@ export function parseMemory(raw: unknown): MemoryState {
     status: s.status === "playing" || s.status === "finished" ? s.status : "waiting",
     winner: s.winner === "a" || s.winner === "b" || s.winner === "draw" ? s.winner : null,
     version: typeof s.version === "number" ? s.version : 0,
+    scored: Boolean(s.scored),
     cards,
     scores: {
       a: typeof s.scores?.a === "number" ? s.scores.a : 0,

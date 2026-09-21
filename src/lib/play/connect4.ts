@@ -39,6 +39,7 @@ export function parseConnect4(raw: unknown): Connect4State {
     status: s.status === "playing" || s.status === "finished" ? s.status : "waiting",
     winner: s.winner === "a" || s.winner === "b" || s.winner === "draw" ? s.winner : null,
     version: typeof s.version === "number" ? s.version : 0,
+    scored: Boolean(s.scored),
     board,
   };
 }

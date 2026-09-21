@@ -2,15 +2,13 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import type { BaseState, GameId, PlayMode, Seat } from "./types";
+import type { BaseState, GameId, Seat } from "./types";
 import { seatOf } from "./types";
 
 type Options<S extends BaseState> = {
   gameId: GameId;
-  mode: PlayMode;
   meId: string;
-  /** Required for online — the other person's profile id. */
-  partnerId?: string | null;
+  partnerId: string;
   fresh: () => S;
   parse: (raw: unknown) => S;
   /** True when the parsed row still needs a host to seed a board. */
@@ -23,14 +21,11 @@ function coupleSeats(meId: string, partnerId: string): BaseState["seats"] {
 }
 
 /**
- * Pass-and-play keeps state local.
- * Online writes to `game_sessions` and listens via Supabase Realtime.
+ * Synced board via `game_sessions` + Supabase Realtime.
  * Seats are fixed by profile id so both phones agree without a lobby.
- * The lexicographically-first profile id seeds a fresh board when needed.
  */
 export function useGameSession<S extends BaseState>({
   gameId,
-  mode,
   meId,
   partnerId,
   fresh,
@@ -38,7 +33,7 @@ export function useGameSession<S extends BaseState>({
   needsSeed = () => false,
 }: Options<S>) {
   const [state, setState] = useState<S>(() => fresh());
-  const [ready, setReady] = useState(mode === "pass");
+  const [ready, setReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const writing = useRef(false);
   const localVersion = useRef(0);
@@ -49,13 +44,9 @@ export function useGameSession<S extends BaseState>({
   }, []);
 
   const persist = useCallback(
-    async (next: S) => {
-      if (mode !== "online") {
-        applyLocal(next);
-        return;
-      }
+    async (next: S | BaseState) => {
       writing.current = true;
-      applyLocal(next);
+      applyLocal(next as S);
       const supabase = createClient();
       const { error: err } = await supabase
         .from("game_sessions")
@@ -68,44 +59,19 @@ export function useGameSession<S extends BaseState>({
       writing.current = false;
       if (err) setError(err.message);
     },
-    [applyLocal, gameId, meId, mode],
+    [applyLocal, gameId, meId],
   );
 
   const reset = useCallback(async () => {
     const next = fresh();
-    if (mode === "pass") {
-      next.seats = { a: "pass-a", b: "pass-b" };
-      next.status = "playing";
-      applyLocal(next);
-      return;
-    }
-    if (!partnerId) return;
     next.seats = coupleSeats(meId, partnerId);
     next.status = "playing";
-    // Mark as seeded so guest doesn’t treat it as empty: bump via playing at v0 is ok;
-    // guest needsSeed should check content. Use version 1 after seed write? Keep v0 and
-    // rely on needsSeed content checks per game.
     await persist(next);
-  }, [applyLocal, fresh, meId, mode, partnerId, persist]);
+  }, [fresh, meId, partnerId, persist]);
 
   // Bootstrap
   useEffect(() => {
     let cancelled = false;
-
-    if (mode === "pass") {
-      const next = fresh();
-      next.seats = { a: "pass-a", b: "pass-b" };
-      next.status = "playing";
-      applyLocal(next);
-      setReady(true);
-      return;
-    }
-
-    if (!partnerId) {
-      setError("partner hasn’t signed in yet");
-      setReady(true);
-      return;
-    }
 
     (async () => {
       const supabase = createClient();
@@ -153,13 +119,11 @@ export function useGameSession<S extends BaseState>({
     return () => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- bootstrap once per mode/game
-  }, [gameId, mode, meId, partnerId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- bootstrap once per game
+  }, [gameId, meId, partnerId]);
 
   // Realtime
   useEffect(() => {
-    if (mode !== "online") return;
-
     const supabase = createClient();
     const channel = supabase
       .channel(`game:${gameId}`)
@@ -180,9 +144,9 @@ export function useGameSession<S extends BaseState>({
     return () => {
       void supabase.removeChannel(channel);
     };
-  }, [gameId, mode, parse]);
+  }, [gameId, parse]);
 
-  const mySeat: Seat | null = mode === "pass" ? null : seatOf(state.seats, meId);
+  const mySeat: Seat | null = seatOf(state.seats, meId);
 
-  return { state, setState: persist, reset, ready, error, mySeat, mode };
+  return { state, setState: persist, reset, ready, error, mySeat };
 }

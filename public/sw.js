@@ -1,6 +1,6 @@
-/* Minimal service worker: makes the app installable and keeps the shell's
-   static assets cached. Pages and photos always go to the network (signed
-   URLs expire, and we never want a stale timeline). */
+/* Minimal service worker: makes the app installable, caches shell static
+   assets, and routes letter notification taps to /letters. Pages and photos
+   always go to the network (signed URLs expire, and we never want a stale timeline). */
 const CACHE = "us-static-v1";
 
 self.addEventListener("install", () => {
@@ -28,6 +28,22 @@ self.addEventListener("fetch", (e) => {
       const res = await fetch(e.request);
       if (res.ok) cache.put(e.request, res.clone());
       return res;
+    }),
+  );
+});
+
+self.addEventListener("notificationclick", (e) => {
+  e.notification.close();
+  const target = (e.notification.data && e.notification.data.url) || "/letters";
+  e.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clients) => {
+      for (const client of clients) {
+        if ("focus" in client) {
+          if (client.navigate) client.navigate(target);
+          return client.focus();
+        }
+      }
+      if (self.clients.openWindow) return self.clients.openWindow(target);
     }),
   );
 });

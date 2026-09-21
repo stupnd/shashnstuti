@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { LetterNotifToggle } from "@/components/letter-notif-toggle";
 import { ThemeToggle } from "@/components/theme";
 import { Page, PageHeader } from "@/components/ui";
 import { getCurrentProfile, getSettings } from "@/lib/data";
@@ -26,12 +27,17 @@ export default async function SettingsPage() {
           </div>
         </section>
 
+        <section className="card p-5" style={{ "--card-shadow": "var(--sky)" } as React.CSSProperties}>
+          <p className="label mb-3">alerts</p>
+          <LetterNotifToggle />
+        </section>
+
         <section className="card p-5" style={{ "--card-shadow": "var(--pink)" } as React.CSSProperties}>
           <p className="label mb-4">you</p>
           <ProfileForm profile={me} />
         </section>
 
-        <section className="card p-5" style={{ "--card-shadow": "var(--sky)" } as React.CSSProperties}>
+        <section className="card p-5" style={{ "--card-shadow": "var(--mint)" } as React.CSSProperties}>
           <p className="label">our start date</p>
           <p className="mb-4 mt-1 text-sm text-muted">day 1 — the counter, chapters and wrapped all count from here.</p>
           <StartDateForm startDate={settings.start_date} />

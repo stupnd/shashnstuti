@@ -4,18 +4,16 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { Avatar } from "@/components/ui";
 import { Icon } from "@/components/icons";
-import type { BaseState, PlayMode, PlayerInfo, Seat } from "@/lib/play/types";
+import type { BaseState, PlayerInfo, Seat } from "@/lib/play/types";
 
 export function PlayShell({
   title,
   color,
-  mode,
   children,
   footer,
 }: {
   title: string;
   color: string;
-  mode: PlayMode;
   children: ReactNode;
   footer?: ReactNode;
 }) {
@@ -26,7 +24,7 @@ export function PlayShell({
           <Icon name="back" size={14} /> games
         </Link>
         <span className="chip text-[11px] uppercase tracking-wider" style={{ background: color }}>
-          {mode === "pass" ? "same phone" : "two phones"}
+          live
         </span>
       </div>
       <h1 className="font-marker text-[2rem] leading-tight">
@@ -40,7 +38,6 @@ export function PlayShell({
 
 export function SeatBanner({
   state,
-  mode,
   me,
   partner,
   mySeat,
@@ -48,32 +45,29 @@ export function SeatBanner({
   markB = "them",
 }: {
   state: BaseState;
-  mode: PlayMode;
   me: PlayerInfo;
-  partner: PlayerInfo | null;
+  partner: PlayerInfo;
   mySeat: Seat | null;
   markA?: string;
   markB?: string;
 }) {
-  if (mode === "online" && state.status === "waiting") {
+  if (state.status === "waiting") {
     return (
       <p className="card mb-5 p-4 text-center text-sm" style={{ ["--card-shadow" as string]: "var(--lilac)" }}>
-        open this game on {partner?.name ?? "their"} phone too — moves sync live.
+        open this game on {partner.name}&apos;s phone too — moves sync live.
       </p>
     );
   }
 
   const nameFor = (seat: Seat) => {
-    if (mode === "pass") return seat === "a" ? me.name : (partner?.name ?? "player 2");
     if (state.seats[seat] === me.id) return me.name;
-    if (partner && state.seats[seat] === partner.id) return partner.name;
+    if (state.seats[seat] === partner.id) return partner.name;
     return seat === "a" ? markA : markB;
   };
 
   const avatarFor = (seat: Seat) => {
-    if (mode === "pass") return seat === "a" ? me.avatar : (partner?.avatar ?? "🤍");
     if (state.seats[seat] === me.id) return me.avatar;
-    if (partner && state.seats[seat] === partner.id) return partner.avatar;
+    if (state.seats[seat] === partner.id) return partner.avatar;
     return "🤍";
   };
 
@@ -82,11 +76,9 @@ export function SeatBanner({
       ? state.winner === "draw"
         ? "it's a draw"
         : `${nameFor(state.winner as Seat)} wins!`
-      : mode === "pass"
-        ? `${nameFor(state.turn)}'s turn`
-        : mySeat === state.turn
-          ? "your turn"
-          : `${nameFor(state.turn)}'s turn`;
+      : mySeat === state.turn
+        ? "your turn"
+        : `${nameFor(state.turn)}'s turn`;
 
   return (
     <div className="mb-5 flex items-center justify-between gap-3">

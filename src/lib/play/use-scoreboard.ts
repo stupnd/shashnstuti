@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { emptyScoreboard, parseScoreboard, type ScoreboardState } from "./scores";
+import { emptyScoreboard, parseScoreboard, SCOREBOARD_STORAGE_KEY, type ScoreboardState } from "./scores";
 import { loadScoreboard, resetScoreboard } from "./scoreboard-store";
 
 export function useScoreboard() {
@@ -40,13 +40,17 @@ export function useScoreboard() {
     };
   }, [remote]);
 
-  // Also refresh when returning to the hub (storage event from other tabs / same origin writes).
   useEffect(() => {
     const onStorage = (e: StorageEvent) => {
-      if (e.key === "scrapbook-game-scores") void refresh();
+      if (e.key === SCOREBOARD_STORAGE_KEY) void refresh();
     };
+    const onFocus = () => void refresh();
     window.addEventListener("storage", onStorage);
-    return () => window.removeEventListener("storage", onStorage);
+    window.addEventListener("focus", onFocus);
+    return () => {
+      window.removeEventListener("storage", onStorage);
+      window.removeEventListener("focus", onFocus);
+    };
   }, [refresh]);
 
   const resetAll = useCallback(async () => {

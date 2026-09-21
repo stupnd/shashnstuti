@@ -2,28 +2,10 @@
 
 import { useCallback, useRef } from "react";
 import { recordMatchResult } from "@/lib/play/scoreboard-store";
-import type { BaseState, GameId, PlayMode, PlayerInfo } from "@/lib/play/types";
-
-function idsForSeats(
-  mode: PlayMode,
-  me: PlayerInfo,
-  partner: PlayerInfo | null,
-  seats: BaseState["seats"],
-): { aId: string; bId: string } | null {
-  if (mode === "pass") {
-    return { aId: me.id, bId: partner?.id ?? "player-2" };
-  }
-  if (!seats.a || !seats.b) return null;
-  return { aId: seats.a, bId: seats.b };
-}
+import type { BaseState, GameId } from "@/lib/play/types";
 
 /** Persist game state and tally a newly finished match once. */
-export function useRecordOnFinish(
-  gameId: GameId,
-  mode: PlayMode,
-  me: PlayerInfo,
-  partner: PlayerInfo | null,
-) {
+export function useRecordOnFinish(gameId: GameId) {
   const locking = useRef(false);
 
   return useCallback(
@@ -34,10 +16,11 @@ export function useRecordOnFinish(
           return;
         }
         locking.current = true;
-        const ids = idsForSeats(mode, me, partner, next.seats);
-        if (ids) {
+        const aId = next.seats.a;
+        const bId = next.seats.b;
+        if (aId && bId) {
           try {
-            await recordMatchResult(gameId, ids.aId, ids.bId, next.winner);
+            await recordMatchResult(gameId, aId, bId, next.winner);
           } catch {
             /* still mark scored */
           }
@@ -48,6 +31,6 @@ export function useRecordOnFinish(
       }
       await persist(next);
     },
-    [gameId, me, mode, partner],
+    [gameId],
   );
 }

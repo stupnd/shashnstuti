@@ -66,6 +66,11 @@ export function Envelope({ id, title, from, state, unlockAt }: Props) {
           <Icon name={state === "locked" ? "lock" : "heartFilled"} size={state === "locked" ? 22 : 26} />
         </span>
         {state === "open" && <span className="label absolute right-3 top-2 text-[9px]">opened</span>}
+        {state === "sealed" && (
+          <span className="absolute left-3 top-2 rounded-full bg-accent px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white">
+            new
+          </span>
+        )}
       </div>
       <p className="mt-2 text-sm font-semibold leading-tight">{title}</p>
       <p className="label mt-0.5">{state === "locked" ? `unlocks in ${countdown ?? "…"}` : `from ${from}`}</p>

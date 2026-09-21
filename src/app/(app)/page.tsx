@@ -7,6 +7,7 @@ import { Avatar, Page, PageHeader } from "@/components/ui";
 import { getCurrentProfile, getPartner, getSettings } from "@/lib/data";
 import { dayOfUs, formatLongDate, formatShortDate, nextAnniversary, todayDateOnly } from "@/lib/dates";
 import { fetchLatest, fetchOnThisDay } from "@/lib/entries";
+import { fetchUnopenedLetters } from "@/lib/letters";
 
 function ActionCard({ href, icon, color, children }: { href: string; icon: IconName; color: string; children: React.ReactNode }) {
   return (
@@ -25,18 +26,20 @@ function ActionCard({ href, icon, color, children }: { href: string; icon: IconN
 
 export default async function HomePage() {
   const today = todayDateOnly();
-  const [me, partner, settings, onThisDay, latest] = await Promise.all([
+  const [me, partner, settings, onThisDay, latest, unopened] = await Promise.all([
     getCurrentProfile(),
     getPartner(),
     getSettings(),
     fetchOnThisDay(today),
     fetchLatest(6),
+    fetchUnopenedLetters(),
   ]);
 
   const day = dayOfUs(settings.start_date);
   const anniversary = nextAnniversary(settings.start_date);
   const isAnniversary = anniversary.daysUntil === 0;
   const memory = onThisDay[0];
+  const topLetter = unopened[0];
 
   return (
     <Page>
@@ -66,6 +69,27 @@ export default async function HomePage() {
             <span>waiting for shash…</span>
           )}
         </div>
+
+        {topLetter && (
+          <Link
+            href="/letters"
+            transitionTypes={["nav-forward"]}
+            className="card soft-glow mt-5 flex items-center gap-3 p-4 transition-transform hover:-translate-y-0.5"
+            style={{ "--card-shadow": "var(--pink)" } as React.CSSProperties}
+          >
+            <span className="sticker bob h-12 w-12 shrink-0 bg-pink text-accent">
+              <Icon name="envelope" size={22} strokeWidth={2} />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="label">you&apos;ve got mail</span>
+              <span className="font-marker mt-0.5 block truncate text-2xl leading-tight">{topLetter.title}</span>
+              <span className="text-sm text-muted">
+                {unopened.length === 1 ? "a sealed letter is waiting — tap to open" : `${unopened.length} sealed letters are waiting`}
+              </span>
+            </span>
+            <Icon name="back" size={18} className="rotate-180 shrink-0 text-muted" />
+          </Link>
+        )}
 
         <section className={`card mt-7 p-5 ${isAnniversary ? "soft-glow" : "shimmy"}`} style={{ "--card-shadow": isAnniversary ? "var(--accent)" : "var(--butter)", animationDuration: isAnniversary ? undefined : "6s" } as React.CSSProperties}>
           <p className="label">{isAnniversary ? "today!!!" : "next anniversary"}</p>

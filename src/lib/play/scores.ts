@@ -72,7 +72,7 @@ function addResult(board: ScoreboardState, playerId: string, gameId: GameId, fie
 
 /**
  * Apply one finished match to the scoreboard.
- * `aId` / `bId` are profile ids (or local placeholders for pass-and-play).
+ * `aId` / `bId` are the two players' profile ids.
  */
 export function applyMatchResult(
   board: ScoreboardState,
