@@ -4,7 +4,7 @@ import { ReplayOnboardingButton } from "@/components/onboarding";
 import { ThemeToggle } from "@/components/theme";
 import { Page, PageHeader } from "@/components/ui";
 import { getCurrentProfile, getSettings } from "@/lib/data";
-import { ProfileForm, StartDateForm } from "./forms";
+import { ProfileForm, SpotifyForm, StartDateForm } from "./forms";
 
 export const metadata: Metadata = { title: "settings" };
 
@@ -28,6 +28,12 @@ export default async function SettingsPage() {
           </div>
         </section>
 
+        <section className="card p-5" style={{ "--card-shadow": "var(--mint)" } as React.CSSProperties}>
+          <p className="label mb-3">soundtrack</p>
+          <p className="mb-3 font-marker text-xl leading-tight">our playlist</p>
+          <SpotifyForm spotifyUrl={settings.spotify_url} />
+        </section>
+
         <section className="card p-5" style={{ "--card-shadow": "var(--lilac)" } as React.CSSProperties}>
           <p className="label mb-3">intro</p>
           <p className="mb-3 font-marker text-xl leading-tight">need a refresher?</p>
@@ -45,7 +51,7 @@ export default async function SettingsPage() {
           <ProfileForm profile={me} />
         </section>
 
-        <section className="card p-5" style={{ "--card-shadow": "var(--mint)" } as React.CSSProperties}>
+        <section className="card p-5" style={{ "--card-shadow": "var(--peach)" } as React.CSSProperties}>
           <p className="label">our start date</p>
           <p className="mb-4 mt-1 text-sm text-muted">day 1 — the counter, chapters and wrapped all count from here.</p>
           <StartDateForm startDate={settings.start_date} />

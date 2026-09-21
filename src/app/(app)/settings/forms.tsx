@@ -3,7 +3,7 @@
 import { useActionState, useState } from "react";
 import { AVATARS, Icon, iconFor } from "@/components/icons";
 import type { Profile } from "@/lib/database.types";
-import { updateProfile, updateStartDate, type SettingsState } from "./actions";
+import { updateProfile, updateSpotifyUrl, updateStartDate, type SettingsState } from "./actions";
 
 function Status({ state }: { state: SettingsState }) {
   if (state.error) return <p className="text-sm text-accent" role="alert">{state.error}</p>;
@@ -49,6 +49,34 @@ export function StartDateForm({ startDate }: { startDate: string }) {
       <input name="start_date" type="date" defaultValue={startDate} className="input" required />
       <div className="flex items-center gap-3">
         <button className="btn btn-soft" disabled={pending}>{pending ? "saving…" : "update"}</button>
+        <Status state={state} />
+      </div>
+    </form>
+  );
+}
+
+export function SpotifyForm({ spotifyUrl }: { spotifyUrl: string | null }) {
+  const [state, action, pending] = useActionState(updateSpotifyUrl, {});
+  return (
+    <form action={action} className="space-y-4">
+      <label className="block">
+        <span className="label">spotify link</span>
+        <input
+          name="spotify_url"
+          type="url"
+          defaultValue={spotifyUrl ?? ""}
+          placeholder="https://open.spotify.com/playlist/…"
+          className="input mt-2"
+        />
+      </label>
+      <p className="text-sm text-muted">
+        paste a playlist, album, or track — it shows up as the pink music button while you browse.
+      </p>
+      <div className="flex items-center gap-3">
+        <button className="btn btn-mint" disabled={pending}>
+          <Icon name="music" size={16} />
+          {pending ? "saving…" : "save soundtrack"}
+        </button>
         <Status state={state} />
       </div>
     </form>

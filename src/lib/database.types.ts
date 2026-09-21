@@ -17,6 +17,7 @@ export type Profile = {
 export type Settings = {
   id: number;
   start_date: string; // YYYY-MM-DD
+  spotify_url: string | null;
   updated_at: string;
 };
 
@@ -111,7 +112,7 @@ export type Database = {
       };
       settings: {
         Row: Settings;
-        Insert: Optional<Settings, "id" | "updated_at">;
+        Insert: Optional<Settings, "id" | "spotify_url" | "updated_at">;
         Update: Partial<Settings>;
         Relationships: [];
       };

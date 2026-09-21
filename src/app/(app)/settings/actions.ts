@@ -46,3 +46,28 @@ export async function updateStartDate(
   revalidatePath("/", "layout");
   return { ok: true };
 }
+
+export async function updateSpotifyUrl(
+  _prev: SettingsState,
+  formData: FormData,
+): Promise<SettingsState> {
+  const raw = String(formData.get("spotify_url") ?? "").trim();
+  let spotify_url: string | null = null;
+  if (raw) {
+    const { isValidSpotifyUrl, parseSpotifyEmbed } = await import("@/lib/spotify");
+    if (!isValidSpotifyUrl(raw)) {
+      return { error: "paste a spotify playlist, album, or track link" };
+    }
+    spotify_url = parseSpotifyEmbed(raw)!.openUrl;
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("settings")
+    .update({ spotify_url, updated_at: new Date().toISOString() })
+    .eq("id", 1);
+
+  if (error) return { error: error.message };
+  revalidatePath("/", "layout");
+  return { ok: true };
+}

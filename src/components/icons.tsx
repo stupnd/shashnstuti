@@ -35,6 +35,15 @@ const P = {
       <path d="M9 3.5h6l-.8 6.2H17L12 15.5 7 9.7h2.8Z" fill="currentColor" />
     </>
   ),
+  /** Eighth note — music / Spotify. */
+  music: (
+    <>
+      <path d="M9 18.5a2.5 2.5 0 1 1-2.2-2.48" />
+      <path d="M16.5 16a2.5 2.5 0 1 1-2.2-2.48" />
+      <path d="M11.5 16.1V5.5l7-1.5v10.6" />
+      <path d="M11.5 8.2 18.5 6.8" />
+    </>
+  ),
   dice: <><rect x="4.5" y="4.5" width="15" height="15" rx="3" /><circle cx="8.5" cy="8.5" r=".9" fill="currentColor" /><circle cx="15.5" cy="8.5" r=".9" fill="currentColor" /><circle cx="12" cy="12" r=".9" fill="currentColor" /><circle cx="8.5" cy="15.5" r=".9" fill="currentColor" /><circle cx="15.5" cy="15.5" r=".9" fill="currentColor" /></>,
   gear: <><circle cx="12" cy="12" r="3" /><path d="M12 3.5v2.3M12 18.2v2.3M3.5 12h2.3M18.2 12h2.3M6 6l1.6 1.6M16.4 16.4 18 18M6 18l1.6-1.6M16.4 7.6 18 6" /></>,
   plus: <path d="M12 5.5v13M5.5 12h13" />,
