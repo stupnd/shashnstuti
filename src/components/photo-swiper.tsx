@@ -14,6 +14,7 @@ export function PhotoSwiper({
   alt,
   onDelete,
   onMove,
+  onEdge,
 }: {
   photos: PhotoWithUrl[];
   alt: string;
@@ -21,6 +22,8 @@ export function PhotoSwiper({
   onDelete?: (photoId: string) => Promise<void>;
   /** When given, the author can move the current photo to another date. */
   onMove?: (photoId: string, date: string) => Promise<void>;
+  /** Swiping past the last photo (or before the first) calls this. */
+  onEdge?: (direction: "next" | "prev") => void;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(0);
@@ -54,21 +57,44 @@ export function PhotoSwiper({
     (d: number) => {
       const el = ref.current;
       if (!el) return;
+      if (d > 0 && index >= count - 1) return onEdge?.("next");
+      if (d < 0 && index <= 0) return onEdge?.("prev");
       const next = Math.min(count - 1, Math.max(0, index + d));
       el.scrollTo({ left: next * el.clientWidth, behavior: "smooth" });
     },
-    [count, index],
+    [count, index, onEdge],
   );
 
+  // Touch: a horizontal swipe while already at the first/last photo moves to
+  // the previous/next moment.
+  const touch = useRef<{ x: number; y: number; atStart: boolean; atEnd: boolean } | null>(null);
+  function onTouchStart(e: React.TouchEvent) {
+    const el = ref.current;
+    if (!el) return;
+    const t = e.touches[0];
+    touch.current = { x: t.clientX, y: t.clientY, atStart: el.scrollLeft <= 2, atEnd: el.scrollLeft + el.clientWidth >= el.scrollWidth - 2 };
+  }
+  function onTouchEnd(e: React.TouchEvent) {
+    const start = touch.current;
+    touch.current = null;
+    if (!start || !onEdge) return;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - start.x;
+    const dy = t.clientY - start.y;
+    if (Math.abs(dx) < 70 || Math.abs(dy) > Math.abs(dx)) return;
+    if (dx < 0 && start.atEnd) onEdge("next");
+    if (dx > 0 && start.atStart) onEdge("prev");
+  }
+
   useEffect(() => {
-    if (count < 2) return;
+    if (count < 2 && !onEdge) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "ArrowRight") go(1);
       if (e.key === "ArrowLeft") go(-1);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [count, go]);
+  }, [count, go, onEdge]);
 
   if (count === 0) {
     return (
@@ -94,7 +120,7 @@ export function PhotoSwiper({
   return (
     <div>
       <div className="relative">
-      <div ref={ref} className="swiper bg-bg-soft" style={{ height: "min(72vh, 640px)" }}>
+      <div ref={ref} className="swiper bg-bg-soft" style={{ height: "min(72vh, 640px)" }} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
         {photos.map((p, i) => (
           <div key={p.id} className="flex items-center justify-center" style={{ height: "min(72vh, 640px)" }}>
             <ViewTransition name={`photo-${p.id}`} share="morph" default="none">
@@ -112,12 +138,12 @@ export function PhotoSwiper({
         ))}
       </div>
 
-      {count > 1 && (
+      {(count > 1 || onEdge) && (
         <>
           <button
             type="button"
             onClick={() => go(-1)}
-            disabled={index === 0}
+            disabled={index === 0 && !onEdge}
             aria-label="Previous photo"
             className="pill absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center text-ink disabled:opacity-0"
           >
@@ -126,7 +152,7 @@ export function PhotoSwiper({
           <button
             type="button"
             onClick={() => go(1)}
-            disabled={index === count - 1}
+            disabled={index === count - 1 && !onEdge}
             aria-label="Next photo"
             className="pill absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center text-ink disabled:opacity-0"
           >

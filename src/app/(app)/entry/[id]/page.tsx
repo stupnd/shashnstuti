@@ -8,15 +8,39 @@ import { Reactions } from "@/components/reactions";
 import { Avatar, Page } from "@/components/ui";
 import { getCurrentProfile } from "@/lib/data";
 
-import { fetchEntry, fetchReactions } from "@/lib/entries";
+import { fetchEntry, fetchNeighbors, fetchReactions, type Neighbor } from "@/lib/entries";
+import { formatShortDate } from "@/lib/dates";
 
 export const metadata: Metadata = { title: "moment" };
+
+function NeighborCard({ n, label, dir }: { n: Neighbor | null; label: string; dir: "prev" | "next" }) {
+  if (!n) return <span />;
+  return (
+    <Link
+      href={`/entry/${n.id}`}
+      transitionTypes={[dir === "next" ? "nav-forward" : "nav-back"]}
+      className={`card-soft flex items-center gap-3 p-2.5 hover:-translate-y-0.5 ${dir === "next" ? "flex-row-reverse text-right" : ""}`}
+    >
+      <span className="h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-bg-soft">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        {n.url && <img src={n.url} alt="" className="h-full w-full object-cover" />}
+      </span>
+      <span className="min-w-0">
+        <span className="label inline-flex items-center gap-1">
+          {dir === "prev" && <Icon name="back" size={11} />}{label}{dir === "next" && <Icon name="back" size={11} className="rotate-180" />}
+        </span>
+        <span className="font-hand block truncate text-lg leading-tight">{n.title ?? formatShortDate(n.date)}</span>
+      </span>
+    </Link>
+  );
+}
 
 export default async function EntryPage({ params }: PageProps<"/entry/[id]">) {
   const { id } = await params;
   const [me, entry, reactions] = await Promise.all([getCurrentProfile(), fetchEntry(id), fetchReactions(id)]);
   if (!entry) notFound();
   const mine = entry.author === me.id;
+  const { older, newer } = await fetchNeighbors(entry);
 
   return (
     <Page>
@@ -29,7 +53,7 @@ export default async function EntryPage({ params }: PageProps<"/entry/[id]">) {
       </div>
 
       <div className="overflow-hidden rounded-3xl border-[3px] border-ink shadow-[5px_5px_0_var(--peach)]">
-        <EntryPhotos photos={entry.photos} alt={entry.title ?? entry.note ?? "photo"} canEdit={mine} />
+        <EntryPhotos photos={entry.photos} alt={entry.title ?? entry.note ?? "photo"} canEdit={mine} older={older} newer={newer} />
       </div>
 
       <article className="mt-6 space-y-6">
@@ -70,6 +94,11 @@ export default async function EntryPage({ params }: PageProps<"/entry/[id]">) {
         )}
 
         <Reactions entryId={entry.id} reactions={reactions} meId={me.id} />
+
+        <nav className="grid grid-cols-2 gap-3 pt-2" aria-label="Neighbouring moments">
+          <NeighborCard n={newer} label="newer" dir="prev" />
+          <NeighborCard n={older} label="older" dir="next" />
+        </nav>
       </article>
     </main>
     </Page>

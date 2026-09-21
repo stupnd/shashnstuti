@@ -199,3 +199,25 @@ export async function fetchSlides(from?: string, to?: string): Promise<Slide[]> 
       })),
   ).filter((s) => s.url);
 }
+
+export type Neighbor = { id: string; date: string; title: string | null; url: string | null };
+
+/** The moments right before and after this one in book order (newest first). */
+export async function fetchNeighbors(entry: Pick<Entry, "date" | "created_at">): Promise<{ newer: Neighbor | null; older: Neighbor | null }> {
+  const supabase = await createClient();
+  const sel = "id, date, title, created_at, photos(storage_path, sort_order)";
+  const [{ data: olderRows }, { data: newerRows }] = await Promise.all([
+    supabase.from("entries").select(sel)
+      .or(`date.lt.${entry.date},and(date.eq.${entry.date},created_at.lt.${entry.created_at})`)
+      .order("date", { ascending: false }).order("created_at", { ascending: false }).limit(1),
+    supabase.from("entries").select(sel)
+      .or(`date.gt.${entry.date},and(date.eq.${entry.date},created_at.gt.${entry.created_at})`)
+      .order("date", { ascending: true }).order("created_at", { ascending: true }).limit(1),
+  ]);
+  type Row = { id: string; date: string; title: string | null; photos: { storage_path: string; sort_order: number }[] };
+  const rows = [...(olderRows ?? []), ...(newerRows ?? [])] as unknown as Row[];
+  const cover = (r: Row) => [...(r.photos ?? [])].sort((a, b) => a.sort_order - b.sort_order)[0]?.storage_path;
+  const urls = await signPhotoUrls(supabase, rows.map(cover).filter(Boolean) as string[]);
+  const toN = (r?: Row): Neighbor | null => (r ? { id: r.id, date: r.date, title: r.title, url: urls.get(cover(r) ?? "") ?? null } : null);
+  return { older: toN(rows.find((r) => (olderRows ?? []).some((o) => o.id === r.id))), newer: toN(rows.find((r) => (newerRows ?? []).some((o) => o.id === r.id))) };
+}
