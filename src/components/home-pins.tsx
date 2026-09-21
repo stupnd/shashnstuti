@@ -33,9 +33,11 @@ function PinButton({
       }}
       aria-pressed={pinned}
       aria-label={pinned ? "Unpin from home" : "Pin to home"}
-      className={`sticker h-9 w-9 transition-transform hover:scale-110 ${pinned ? "bg-accent text-white" : "bg-surface text-ink"} ${className}`}
+      className={`sticker h-9 w-9 transition-transform hover:scale-110 disabled:opacity-100 ${
+        pinned ? "bg-accent text-ink ring-2 ring-ink" : "bg-surface text-ink"
+      } ${className}`}
     >
-      <Icon name={pinned ? "pushpinFilled" : "pushpin"} size={16} strokeWidth={2.2} />
+      <Icon name="pushpin" size={16} strokeWidth={2.4} />
     </button>
   );
 }
@@ -58,8 +60,8 @@ export function HomePinTile({ pin }: { pin: HomePinCard }) {
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={pin.url} alt={caption} loading="lazy" style={{ objectPosition: "50% 30%" }} />
-      <span className="absolute right-2 top-2 sticker h-8 w-8 bg-accent text-white">
-        <Icon name="pushpinFilled" size={14} />
+      <span className="absolute right-2 top-2 sticker h-8 w-8 bg-accent text-ink ring-2 ring-ink">
+        <Icon name="pushpin" size={14} strokeWidth={2.4} />
       </span>
       <div className="tile-strip">
         <p className="font-hand line-clamp-1 text-lg leading-tight text-ink">{caption}</p>
@@ -84,6 +86,7 @@ export function PinPicker({
   const [cursor, setCursor] = useState(initialCursor);
   const [pinnedCount, setPinnedCount] = useState(initialPinnedCount);
   const [error, setError] = useState<string | null>(null);
+  const [busyId, setBusyId] = useState<string | null>(null);
   const [pending, start] = useTransition();
   const [optimistic, setOptimistic] = useOptimistic(
     photos,
@@ -116,9 +119,11 @@ export function PinPicker({
 
   function toggle(photoId: string, currentlyPinned: boolean) {
     setError(null);
+    setBusyId(photoId);
     start(async () => {
       setOptimistic({ id: photoId, pinned: !currentlyPinned });
       const res = await toggleHomePin(photoId);
+      setBusyId(null);
       if ("error" in res) {
         setError(res.error);
         return;
@@ -136,7 +141,7 @@ export function PinPicker({
           tap the <Icon name="pushpin" size={14} className="inline align-[-2px]" /> to pin a photo to home
         </p>
         <span className="chip pointer-events-none text-xs" style={{ background: "var(--pink)" }}>
-          <Icon name="pushpinFilled" size={12} />
+          <Icon name="pushpin" size={12} strokeWidth={2.4} />
           {pinnedCount} pinned
         </span>
       </div>
@@ -171,7 +176,7 @@ export function PinPicker({
                 </div>
               </Link>
               <div className="absolute left-2 top-2 z-10">
-                <PinButton pinned={p.pinned} busy={pending} onToggle={() => toggle(p.photoId, p.pinned)} />
+                <PinButton pinned={p.pinned} busy={busyId === p.photoId} onToggle={() => toggle(p.photoId, p.pinned)} />
               </div>
             </li>
           ))}
