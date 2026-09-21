@@ -5,7 +5,6 @@ import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile, getPartner } from "@/lib/data";
 import {
   emptyThoughts,
-  ensureThoughtsRow,
   MAX_THOUGHT_LEN,
   MAX_THOUGHTS,
   parseThoughts,
@@ -13,6 +12,7 @@ import {
   type Thought,
   type ThoughtsState,
 } from "@/lib/thoughts";
+import { ensureThoughtsRow } from "@/lib/thoughts-data";
 
 async function readState(): Promise<ThoughtsState> {
   await ensureThoughtsRow();

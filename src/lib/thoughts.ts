@@ -1,6 +1,3 @@
-import { createClient } from "@/lib/supabase/server";
-import { getCurrentProfile } from "@/lib/data";
-
 export const THOUGHTS_SESSION_ID = "thoughts";
 export const MAX_THOUGHTS = 40;
 export const MAX_THOUGHT_LEN = 160;
@@ -32,21 +29,4 @@ export function parseThoughts(raw: unknown): ThoughtsState {
     cleaned.push({ id: t.id, author: t.author, body: body.slice(0, MAX_THOUGHT_LEN), created_at: t.created_at });
   }
   return { items: cleaned.slice(0, MAX_THOUGHTS) };
-}
-
-/** Prefetched for the home page (server). */
-export async function fetchThoughts(): Promise<ThoughtsState> {
-  const supabase = await createClient();
-  const { data } = await supabase.from("game_sessions").select("state").eq("id", THOUGHTS_SESSION_ID).maybeSingle();
-  if (!data) return emptyThoughts();
-  return parseThoughts(data.state);
-}
-
-export async function ensureThoughtsRow(): Promise<void> {
-  const me = await getCurrentProfile();
-  const supabase = await createClient();
-  await supabase.from("game_sessions").upsert(
-    { id: THOUGHTS_SESSION_ID, state: emptyThoughts(), updated_by: me.id },
-    { onConflict: "id", ignoreDuplicates: true },
-  );
 }

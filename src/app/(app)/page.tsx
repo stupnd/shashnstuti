@@ -9,7 +9,7 @@ import { getCurrentProfile, getPartner, getSettings } from "@/lib/data";
 import { dayOfUs, formatLongDate, formatShortDate, nextAnniversary, todayDateOnly } from "@/lib/dates";
 import { fetchLatest, fetchOnThisDay } from "@/lib/entries";
 import { fetchUnopenedLetters } from "@/lib/letters";
-import { fetchThoughts } from "@/lib/thoughts";
+import { fetchThoughts } from "@/lib/thoughts-data";
 
 function Shortcut({ href, icon, color, label }: { href: string; icon: IconName; color: string; label: string }) {
   return (
