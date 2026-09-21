@@ -1,26 +1,208 @@
 @import "tailwindcss";
 
+/* ---------------------------------------------------------------------------
+   Quiet, airy, ink-on-off-white. Light mode only, on purpose.
+--------------------------------------------------------------------------- */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #faf8f4;
+  --bg-soft: #f2efe9;
+  --surface: #ffffff;
+  --ink: #1f1c19;
+  --muted: #918b82;
+  --line: #e9e4dc;
+  --accent: #e0464f;        /* the one red */
+  --accent-deep: #c4353e;
+  --accent-soft: #fbe6e7;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg: var(--bg);
+  --color-bg-soft: var(--bg-soft);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-deep: var(--accent-deep);
+  --color-accent-soft: var(--accent-soft);
+
+  --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-script: var(--font-homemade-apple), "Bradley Hand", cursive;
+  --font-hand: var(--font-caveat), "Segoe Script", cursive;
+
+  --shadow-card: 0 1px 2px rgb(31 28 25 / 0.04), 0 10px 30px -14px rgb(31 28 25 / 0.18);
+  --shadow-float: 0 2px 6px rgb(31 28 25 / 0.08), 0 16px 40px -12px rgb(31 28 25 / 0.28);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+html { color-scheme: light only; -webkit-tap-highlight-color: transparent; }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  min-height: 100dvh;
 }
+
+.font-script { font-family: var(--font-script); }
+.font-hand { font-family: var(--font-hand); }
+
+/* Tiny spaced-out caption, like "SCROLL TO UNFOLD". */
+.label {
+  font-size: 0.64rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+/* Hand-drawn icon wobble (filter lives in RoughFilter). */
+.doodle { filter: url(#rough); }
+
+/* ---- Surfaces ---------------------------------------------------------- */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 1.25rem;
+  box-shadow: var(--shadow-card);
+}
+.pill {
+  background: var(--surface);
+  border-radius: 999px;
+  box-shadow: var(--shadow-float);
+}
+.dashed {
+  border: 1.5px dashed var(--line);
+  border-radius: 1.25rem;
+  background: var(--surface);
+}
+
+/* ---- Controls ---------------------------------------------------------- */
+.input {
+  width: 100%;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  border-radius: 0.9rem;
+  padding: 0.8rem 1rem;
+  font-size: 1rem;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 150ms, box-shadow 150ms;
+}
+.input:focus { border-color: var(--ink); box-shadow: 0 0 0 3px rgb(31 28 25 / 0.06); }
+.input::placeholder { color: var(--muted); }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+  border-radius: 999px; padding: 0.75rem 1.3rem;
+  font-weight: 600; font-size: 0.9rem; letter-spacing: 0.01em;
+  transition: transform 120ms, background-color 150ms, opacity 150ms, box-shadow 150ms;
+  user-select: none;
+}
+.btn:active { transform: scale(0.97); }
+.btn:disabled { opacity: 0.45; pointer-events: none; }
+.btn-primary { background: var(--accent); color: #fff; box-shadow: 0 6px 18px -8px rgb(224 70 79 / 0.7); }
+.btn-primary:hover { background: var(--accent-deep); }
+.btn-soft { background: var(--bg-soft); color: var(--ink); }
+.btn-soft:hover { background: var(--line); }
+.btn-ghost { background: transparent; color: var(--muted); }
+.btn-ghost:hover { color: var(--ink); }
+
+/* Selectable chip / icon button */
+.chip {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
+  border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+  border-radius: 999px; padding: 0.45rem 0.9rem; font-size: 0.85rem;
+  transition: background-color 150ms, border-color 150ms, transform 120ms;
+}
+.chip:hover { background: var(--bg-soft); }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.chip-icon { padding: 0; width: 2.75rem; height: 2.75rem; border-radius: 999px; }
+
+/* ---- Bento feed -------------------------------------------------------- */
+/* Square cells: row height = column width, so a 1×1 tile is a true square,
+   2×1 a 2:1 strip and 1×2 a 1:2 column. Content width = min(100vw, max-w) - padding. */
+.bento {
+  --bento-gap: 0.6rem;
+  --bento-w: calc(min(100vw, 32rem) - 2.5rem);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-rows: calc((var(--bento-w) - var(--bento-gap)) / 2);
+  grid-auto-flow: dense;
+  gap: var(--bento-gap);
+}
+@media (min-width: 640px) {
+  .bento {
+    --bento-gap: 0.75rem;
+    --bento-w: calc(min(100vw, 48rem) - 2.5rem);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-auto-rows: calc((var(--bento-w) - 3 * var(--bento-gap)) / 4);
+  }
+}
+.tile {
+  position: relative; overflow: hidden; border-radius: 1.1rem;
+  background: var(--bg-soft);
+  transition: transform 350ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.tile:hover { transform: translateY(-2px); }
+.tile img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tile-fade {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgb(31 28 25 / 0.55) 0%, rgb(31 28 25 / 0) 45%);
+}
+
+/* ---- Motion ------------------------------------------------------------ */
+@keyframes fade-up { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+.animate-fade-up { animation: fade-up 500ms cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+
+.reveal { opacity: 0; transform: translateY(14px); transition: opacity 650ms cubic-bezier(0.2,0.7,0.2,1), transform 650ms cubic-bezier(0.2,0.7,0.2,1); }
+.reveal.in-view { opacity: 1; transform: none; }
+
+@keyframes heart-float {
+  0%   { transform: translateY(0) scale(0.6) rotate(-8deg); opacity: 0; }
+  15%  { opacity: 1; }
+  100% { transform: translateY(-90vh) scale(1.2) rotate(10deg); opacity: 0; }
+}
+.heart-float { animation: heart-float 2.2s ease-out both; }
+
+/* Draw-on squiggle */
+@keyframes draw { to { stroke-dashoffset: 0; } }
+.squiggle path { stroke-dasharray: 600; stroke-dashoffset: 600; animation: draw 1.6s ease-out forwards; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+  .reveal { opacity: 1; transform: none; }
+  .squiggle path { stroke-dashoffset: 0; }
+}
+
+/* ---- Photo swiper ------------------------------------------------------ */
+.swiper { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.swiper::-webkit-scrollbar { display: none; }
+.swiper > * { flex: 0 0 100%; scroll-snap-align: center; }
+
+/* ---- Envelope ---------------------------------------------------------- */
+.envelope-flap { transition: transform 600ms cubic-bezier(0.2, 0.7, 0.2, 1); transform-style: preserve-3d; }
+.envelope-letter { transition: transform 700ms 250ms cubic-bezier(0.2, 0.7, 0.2, 1); }
+.envelope-seal { transition: opacity 300ms; }
+.envelope.opening .envelope-flap { transform: rotateX(180deg); }
+.envelope.opening .envelope-letter { transform: translateY(-45%); }
+.envelope.opening .envelope-seal { opacity: 0; }
+.envelope:not(:disabled):hover .envelope-flap { transform: rotateX(25deg); }
+
+/* ---- Map --------------------------------------------------------------- */
+.map-pin { width: 44px; height: 44px; border-radius: 12px; overflow: hidden; background: #fff; padding: 3px; box-shadow: 0 4px 14px rgb(31 28 25 / 0.3); position: relative; }
+.map-pin::after { content: ""; position: absolute; left: 50%; bottom: -7px; border: 6px solid transparent; border-top-color: #fff; transform: translateX(-50%); }
+.map-pin img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 9px; }
+.map-pin span { display: flex; height: 100%; align-items: center; justify-content: center; }
+.map-pin-milestone { outline: 2px solid var(--accent); }
+.map-popup { font-family: var(--font-sans); color: var(--ink); }
+.map-popup-photos { display: flex; gap: 4px; margin-bottom: 6px; }
+.map-popup-photos img { width: 64px; height: 64px; object-fit: cover; border-radius: 8px; }
+.map-popup-title { font-family: var(--font-hand); font-size: 1.25rem; line-height: 1.1; margin: 0; }
+.map-popup-meta { font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); margin: 2px 0 6px; }
+.map-popup-link { color: var(--accent) !important; font-weight: 600; }
+.leaflet-popup-content-wrapper { border-radius: 14px; }
+.leaflet-container { background: var(--bg-soft); }
+
+/* ---- Wrapped ----------------------------------------------------------- */
+@keyframes wrapped-in { from { opacity: 0; transform: translateY(24px) scale(0.96); } to { opacity: 1; transform: none; } }
+.wrapped-slide { animation: wrapped-in 550ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
