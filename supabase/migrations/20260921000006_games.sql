@@ -25,7 +25,8 @@ create policy "members update games" on public.game_sessions
 insert into public.game_sessions (id, state) values
   ('ttt', '{}'::jsonb),
   ('connect4', '{}'::jsonb),
-  ('memory', '{}'::jsonb),
+  ('dots', '{}'::jsonb),
+  ('showdown', '{}'::jsonb),
   ('scoreboard', '{"players":{},"updated_at":null}'::jsonb);
 
 -- Live sync across devices.

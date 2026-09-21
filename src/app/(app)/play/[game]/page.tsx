@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { ConnectFour } from "@/components/play/connect4-game";
-import { MemoryGame } from "@/components/play/memory-game";
+import { DotsGame } from "@/components/play/dots-game";
+import { ShowdownGame } from "@/components/play/showdown-game";
 import { TicTacToe } from "@/components/play/ttt-game";
 import { getCurrentProfile, getPartner } from "@/lib/data";
 import { getGame } from "@/lib/play/types";
@@ -24,5 +25,6 @@ export default async function GamePage({ params }: PageProps<"/play/[game]">) {
 
   if (meta.id === "ttt") return <TicTacToe me={meInfo} partner={partnerInfo} />;
   if (meta.id === "connect4") return <ConnectFour me={meInfo} partner={partnerInfo} />;
-  return <MemoryGame me={meInfo} partner={partnerInfo} />;
+  if (meta.id === "dots") return <DotsGame me={meInfo} partner={partnerInfo} />;
+  return <ShowdownGame me={meInfo} partner={partnerInfo} />;
 }

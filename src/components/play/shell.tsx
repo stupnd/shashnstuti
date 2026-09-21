@@ -43,6 +43,7 @@ export function SeatBanner({
   mySeat,
   markA = "you",
   markB = "them",
+  statusText,
 }: {
   state: BaseState;
   me: PlayerInfo;
@@ -50,6 +51,8 @@ export function SeatBanner({
   mySeat: Seat | null;
   markA?: string;
   markB?: string;
+  /** Override the turn/winner line (e.g. simultaneous games). */
+  statusText?: string;
 }) {
   if (state.status === "waiting") {
     return (
@@ -72,20 +75,21 @@ export function SeatBanner({
   };
 
   const status =
-    state.status === "finished"
+    statusText ??
+    (state.status === "finished"
       ? state.winner === "draw"
         ? "it's a draw"
         : `${nameFor(state.winner as Seat)} wins!`
       : mySeat === state.turn
         ? "your turn"
-        : `${nameFor(state.turn)}'s turn`;
+        : `${nameFor(state.turn)}'s turn`);
 
   return (
     <div className="mb-5 flex items-center justify-between gap-3">
       <div className="flex items-center gap-2">
-        <SeatChip active={state.turn === "a" && state.status === "playing"} avatar={avatarFor("a")} label={nameFor("a")} mark={markA} color="var(--pink)" />
+        <SeatChip active={!statusText && state.turn === "a" && state.status === "playing"} avatar={avatarFor("a")} label={nameFor("a")} mark={markA} color="var(--pink)" />
         <span className="text-xs font-bold text-muted">vs</span>
-        <SeatChip active={state.turn === "b" && state.status === "playing"} avatar={avatarFor("b")} label={nameFor("b")} mark={markB} color="var(--sky)" />
+        <SeatChip active={!statusText && state.turn === "b" && state.status === "playing"} avatar={avatarFor("b")} label={nameFor("b")} mark={markB} color="var(--sky)" />
       </div>
       <p className="font-hand text-xl leading-none text-ink">{status}</p>
     </div>
