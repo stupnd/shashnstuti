@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Icon, iconFor } from "@/components/icons";
-import { PhotoSwiper } from "@/components/photo-swiper";
+import { EntryPhotos } from "@/components/entry-photos";
 import { Reactions } from "@/components/reactions";
 import { Avatar } from "@/components/ui";
 import { getCurrentProfile } from "@/lib/data";
@@ -27,7 +27,7 @@ export default async function EntryPage({ params }: PageProps<"/entry/[id]">) {
       </div>
 
       <div className="overflow-hidden rounded-3xl">
-        <PhotoSwiper photos={entry.photos} alt={entry.title ?? entry.note ?? "photo"} />
+        <EntryPhotos photos={entry.photos} alt={entry.title ?? entry.note ?? "photo"} canEdit={mine} />
       </div>
 
       <article className="mt-6 space-y-6">

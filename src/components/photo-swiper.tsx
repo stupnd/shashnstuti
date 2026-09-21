@@ -8,9 +8,20 @@ import { Icon } from "./icons";
  * Full-width photo viewer. Swipe on phones (native scroll-snap), arrows on
  * desktop, ← → on a keyboard. Photos are never cropped here — object-contain.
  */
-export function PhotoSwiper({ photos, alt }: { photos: PhotoWithUrl[]; alt: string }) {
+export function PhotoSwiper({
+  photos,
+  alt,
+  onDelete,
+}: {
+  photos: PhotoWithUrl[];
+  alt: string;
+  /** When given, the author can delete the photo they're looking at. */
+  onDelete?: (photoId: string) => Promise<void>;
+}) {
   const ref = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(0);
+  const [confirming, setConfirming] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const count = photos.length;
 
   useEffect(() => {
@@ -50,6 +61,18 @@ export function PhotoSwiper({ photos, alt }: { photos: PhotoWithUrl[]; alt: stri
   }
 
   const current = photos[index];
+
+  async function confirmDelete() {
+    if (!onDelete || !current) return;
+    setDeleting(true);
+    try {
+      await onDelete(current.id);
+      setIndex((i) => Math.max(0, Math.min(i, count - 2)));
+    } finally {
+      setDeleting(false);
+      setConfirming(false);
+    }
+  }
 
   return (
     <div className="relative">
@@ -95,6 +118,28 @@ export function PhotoSwiper({ photos, alt }: { photos: PhotoWithUrl[]; alt: stri
             ))}
           </div>
         </>
+      )}
+
+      {onDelete && !confirming && (
+        <button
+          type="button"
+          onClick={() => setConfirming(true)}
+          aria-label="Delete this photo"
+          className="pill absolute right-3 top-3 flex h-9 w-9 items-center justify-center text-muted hover:text-accent"
+        >
+          <Icon name="trash" size={17} />
+        </button>
+      )}
+      {confirming && (
+        <div className="pill absolute inset-x-3 top-3 flex items-center justify-between gap-2 py-2 pl-4 pr-2 text-sm">
+          <span>delete this photo?</span>
+          <span className="flex gap-1">
+            <button type="button" onClick={() => setConfirming(false)} disabled={deleting} className="btn btn-ghost py-1.5">keep</button>
+            <button type="button" onClick={confirmDelete} disabled={deleting} className="btn btn-primary py-1.5">
+              {deleting ? "deleting…" : "delete"}
+            </button>
+          </span>
+        </div>
       )}
 
       {(current?.caption || count > 1) && (
