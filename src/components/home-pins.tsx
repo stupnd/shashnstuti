@@ -125,7 +125,7 @@ export function HomePinTile({
         style={{ "--tile": color, "--tilt": `${tilt}deg` } as CSSProperties}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={pin.url} alt={caption} loading="lazy" style={{ objectPosition: "50% 30%" }} />
+        <img src={pin.url} alt={caption} loading="lazy" className="object-center" />
         <div className="tile-strip">
           <p className="font-hand line-clamp-1 text-lg leading-tight text-ink">{caption}</p>
           <p className="mt-0.5 text-[9px] font-bold uppercase tracking-[0.18em] text-muted">{formatShortDate(pin.date)}</p>

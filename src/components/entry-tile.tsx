@@ -68,7 +68,7 @@ export function EntryTile({
         {cover ? (
           <ViewTransition name={`photo-${cover.id}`} share="morph" default="none">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={cover.url} alt={cover.caption ?? entry.title ?? ""} loading="lazy" style={{ objectPosition: "50% 30%" }} />
+            <img src={cover.url} alt={cover.caption ?? entry.title ?? ""} loading="lazy" className="object-center" />
           </ViewTransition>
         ) : (
           <div className="flex h-full min-h-[9rem] items-center justify-center text-muted">

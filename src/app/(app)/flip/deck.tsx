@@ -205,7 +205,7 @@ export function Deck({ initial, initialCursor, shuffle }: { initial: EntryCard[]
             >
               {photo ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={photo.url} alt={text || "moment"} draggable={false} className="h-full w-full object-cover" style={{ objectPosition: "50% 30%" }} />
+                <img src={photo.url} alt={text || "moment"} draggable={false} className="h-full w-full object-cover object-center" />
               ) : (
                 <div className="flex h-full flex-col items-center justify-center gap-3 bg-bg-soft px-8 text-center">
                   <Icon name="camera" size={40} className="text-muted" />

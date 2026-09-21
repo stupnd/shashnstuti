@@ -263,7 +263,7 @@ body::after {
   transition: transform 350ms var(--ease-pop), box-shadow 200ms, background-color 350ms ease;
 }
 .tile:hover { transform: rotate(0deg) scale(1.03); box-shadow: 6px 6px 0 var(--tile, var(--peach)); z-index: 1; }
-.tile img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tile img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; }
 .tile-strip {
   position: absolute; inset-x: 0; bottom: 0;
   left: 0; right: 0;
