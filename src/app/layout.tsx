@@ -1,12 +1,12 @@
 import type { Metadata, Viewport } from "next";
-import { Caveat, DM_Sans, Homemade_Apple } from "next/font/google";
+import { Caveat, Fredoka, Gochi_Hand } from "next/font/google";
 import { RoughFilter } from "@/components/icons";
 import { ServiceWorkerRegister } from "@/components/sw-register";
 import "./globals.css";
 
-const dmSans = DM_Sans({ variable: "--font-dm-sans", subsets: ["latin"], display: "swap" });
+const fredoka = Fredoka({ variable: "--font-fredoka", subsets: ["latin"], display: "swap" });
 const caveat = Caveat({ variable: "--font-caveat", subsets: ["latin"], display: "swap" });
-const script = Homemade_Apple({ variable: "--font-homemade-apple", subsets: ["latin"], weight: "400", display: "swap" });
+const gochi = Gochi_Hand({ variable: "--font-gochi", subsets: ["latin"], weight: "400", display: "swap" });
 
 export const metadata: Metadata = {
   title: { default: "Our Scrapbook", template: "%s · Our Scrapbook" },
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#faf8f4",
+  themeColor: "#fff8ef",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -28,7 +28,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${dmSans.variable} ${caveat.variable} ${script.variable} h-full`}>
+    <html lang="en" className={`${fredoka.variable} ${caveat.variable} ${gochi.variable} h-full`}>
       <body className="min-h-full flex flex-col antialiased">
         <RoughFilter />
         {children}

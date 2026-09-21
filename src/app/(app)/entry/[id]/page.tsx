@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { Icon, iconFor } from "@/components/icons";
 import { EntryPhotos } from "@/components/entry-photos";
 import { Reactions } from "@/components/reactions";
-import { Avatar } from "@/components/ui";
+import { Avatar, Page } from "@/components/ui";
 import { getCurrentProfile } from "@/lib/data";
 import { formatLongDate } from "@/lib/dates";
 import { fetchEntry, fetchReactions } from "@/lib/entries";
@@ -18,15 +18,16 @@ export default async function EntryPage({ params }: PageProps<"/entry/[id]">) {
   const mine = entry.author === me.id;
 
   return (
+    <Page>
     <main className="animate-fade-up">
       <div className="flex items-center justify-between pt-[calc(0.75rem+env(safe-area-inset-top))] pb-3">
-        <Link href="/timeline" className="label inline-flex items-center gap-1 hover:text-ink"><Icon name="back" size={14} /> our book</Link>
+        <Link href="/timeline" transitionTypes={["nav-back"]} className="label inline-flex items-center gap-1 hover:text-ink"><Icon name="back" size={14} /> our book</Link>
         {mine && (
-          <Link href={`/entry/${entry.id}/edit`} className="label inline-flex items-center gap-1 hover:text-ink">edit <Icon name="edit" size={14} /></Link>
+          <Link href={`/entry/${entry.id}/edit`} transitionTypes={["nav-forward"]} className="label inline-flex items-center gap-1 hover:text-ink">edit <Icon name="edit" size={14} /></Link>
         )}
       </div>
 
-      <div className="overflow-hidden rounded-3xl">
+      <div className="overflow-hidden rounded-3xl border-[3px] border-ink shadow-[5px_5px_0_var(--peach)]">
         <EntryPhotos photos={entry.photos} alt={entry.title ?? entry.note ?? "photo"} canEdit={mine} />
       </div>
 
@@ -36,13 +37,13 @@ export default async function EntryPage({ params }: PageProps<"/entry/[id]">) {
             {formatLongDate(entry.date)}
             {entry.place && <> · {entry.place}</>}
           </p>
-          {entry.title && <h1 className="font-script mt-2 text-2xl leading-relaxed">{entry.title}</h1>}
+          {entry.title && <h1 className="font-marker mt-2 text-3xl leading-tight">{entry.title}</h1>}
           {entry.is_milestone && (
             <p className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-accent"><Icon name="sparkle" size={14} /> milestone</p>
           )}
         </header>
 
-        <div className="card p-5">
+        <div className="card p-5" style={{ "--card-shadow": "var(--butter)" } as React.CSSProperties}>
           {entry.note ? (
             <p className="whitespace-pre-wrap font-hand text-2xl leading-snug">{entry.note}</p>
           ) : mine ? (
@@ -65,5 +66,6 @@ export default async function EntryPage({ params }: PageProps<"/entry/[id]">) {
         <Reactions entryId={entry.id} reactions={reactions} meId={me.id} />
       </article>
     </main>
+    </Page>
   );
 }

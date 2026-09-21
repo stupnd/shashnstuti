@@ -1,10 +1,26 @@
 import Link from "next/link";
+import { Confetti } from "@/components/confetti";
 import { EntryTile } from "@/components/entry-tile";
-import { Icon } from "@/components/icons";
-import { Avatar, PageHeader, Squiggle } from "@/components/ui";
+import { Icon, type IconName } from "@/components/icons";
+import { Avatar, Page, PageHeader } from "@/components/ui";
 import { getCurrentProfile, getPartner, getSettings } from "@/lib/data";
 import { dayOfUs, formatLongDate, formatShortDate, nextAnniversary, todayDateOnly } from "@/lib/dates";
 import { fetchLatest, fetchOnThisDay } from "@/lib/entries";
+
+function ActionCard({ href, icon, color, children }: { href: string; icon: IconName; color: string; children: React.ReactNode }) {
+  return (
+    <Link
+      href={href}
+      transitionTypes={["nav-forward"]}
+      prefetch={href === "/random" ? false : undefined}
+      className="card flex flex-col items-start justify-between p-4 transition-transform hover:-translate-y-1 hover:-rotate-1"
+      style={{ "--card-shadow": color } as React.CSSProperties}
+    >
+      <span className="sticker h-10 w-10" style={{ background: color }}><Icon name={icon} size={20} strokeWidth={2} /></span>
+      <span className="mt-5 text-sm font-semibold leading-tight">{children}</span>
+    </Link>
+  );
+}
 
 export default async function HomePage() {
   const today = todayDateOnly();
@@ -18,81 +34,79 @@ export default async function HomePage() {
 
   const day = dayOfUs(settings.start_date);
   const anniversary = nextAnniversary(settings.start_date);
+  const isAnniversary = anniversary.daysUntil === 0;
   const memory = onThisDay[0];
 
   return (
-    <main className="relative animate-fade-up">
-      <Squiggle className="pointer-events-none absolute -right-16 -top-2 w-64 opacity-70" flip />
+    <Page>
+      <main className="animate-fade-up">
+        {isAnniversary && <Confetti />}
 
-      <PageHeader
-        title={<>day {day.toLocaleString()} of us</>}
-        caption={`since ${formatShortDate(settings.start_date)}`}
-        action={
-          <Link href="/settings" aria-label="Settings" className="flex h-10 w-10 items-center justify-center rounded-full text-muted hover:bg-bg-soft hover:text-ink">
-            <Icon name="gear" size={20} />
-          </Link>
-        }
-      />
+        <PageHeader
+          title={<>day {day.toLocaleString()} of us</>}
+          caption={`since ${formatShortDate(settings.start_date)}`}
+          hl="var(--pink)"
+          action={
+            <Link href="/settings" transitionTypes={["nav-forward"]} aria-label="Settings" className="btn btn-ghost h-11 w-11 rounded-full p-0">
+              <Icon name="gear" size={22} />
+            </Link>
+          }
+        />
 
-      <div className="mt-6 flex items-center gap-2 text-sm text-muted">
-        <span className="inline-flex items-center gap-1.5"><Avatar value={me.avatar_emoji} /> {me.display_name}</span>
-        <Icon name="heart" size={12} className="text-accent" />
-        {partner ? (
-          <span className="inline-flex items-center gap-1.5"><Avatar value={partner.avatar_emoji} /> {partner.display_name}</span>
-        ) : (
-          <span>waiting for shash to log in…</span>
-        )}
-      </div>
+        <div className="mt-4 flex items-center gap-2 text-sm font-medium text-muted">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-pink px-2.5 py-1 text-ink"><Avatar value={me.avatar_emoji} size={15} /> {me.display_name}</span>
+          <Icon name="heartFilled" size={14} className="text-accent" />
+          {partner ? (
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-sky px-2.5 py-1 text-ink"><Avatar value={partner.avatar_emoji} size={15} /> {partner.display_name}</span>
+          ) : (
+            <span>waiting for shash…</span>
+          )}
+        </div>
 
-      <div className="mt-8 grid gap-3 sm:grid-cols-2">
-        <section className="card p-5">
-          <p className="label">next anniversary</p>
-          <p className="mt-2 text-3xl font-semibold tracking-tight">
-            {anniversary.daysUntil === 0 ? `${anniversary.years} years today` : `${anniversary.daysUntil} days`}
+        <section className="card mt-7 p-5" style={{ "--card-shadow": isAnniversary ? "var(--accent)" : "var(--butter)" } as React.CSSProperties}>
+          <p className="label">{isAnniversary ? "today!!!" : "next anniversary"}</p>
+          <p className="font-marker mt-1 text-4xl leading-tight">
+            {isAnniversary ? `happy ${anniversary.years} years` : `${anniversary.daysUntil} days`}
           </p>
           <p className="mt-1 text-sm text-muted">
-            {anniversary.daysUntil === 0 ? "happy anniversary" : `until ${anniversary.years} years · ${formatLongDate(anniversary.date)}`}
+            {isAnniversary ? "to us. go celebrate." : `until ${anniversary.years} years · ${formatLongDate(anniversary.date)}`}
           </p>
         </section>
 
-        <div className="grid grid-cols-2 gap-3">
-          <Link href="/random" prefetch={false} className="card flex flex-col items-start justify-between p-5 hover:bg-bg-soft">
-            <Icon name="dice" size={24} />
-            <span className="mt-4 text-sm font-semibold">random<br />memory</span>
-          </Link>
-          <Link href="/new" className="card flex flex-col items-start justify-between bg-accent-soft p-5 text-accent-deep hover:bg-accent-soft/70">
-            <Icon name="camera" size={24} />
-            <span className="mt-4 text-sm font-semibold">add a<br />moment</span>
-          </Link>
+        <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-4">
+          <ActionCard href="/watch" icon="sparkle" color="var(--sky)">watch<br />our story</ActionCard>
+          <ActionCard href="/ask" icon="eyes" color="var(--lilac)">ask<br />the book</ActionCard>
+          <ActionCard href="/random" icon="dice" color="var(--mint)">random<br />memory</ActionCard>
+          <ActionCard href="/new" icon="camera" color="var(--peach)">add a<br />moment</ActionCard>
         </div>
-      </div>
 
-      {memory && (
+        {memory && (
+          <section className="mt-10">
+            <div className="mb-3 flex items-baseline justify-between">
+              <h2 className="font-marker text-2xl"><span className="hl" style={{ "--hl": "var(--sky)" } as React.CSSProperties}>on this day</span></h2>
+              <span className="label">{formatShortDate(memory.date)}</span>
+            </div>
+            <div className="bento">
+              <EntryTile entry={memory} meId={me.id} forceSpan="wide" reveal={false} />
+            </div>
+            {onThisDay.length > 1 && <p className="label mt-3">+{onThisDay.length - 1} more from this day</p>}
+          </section>
+        )}
+
         <section className="mt-10">
           <div className="mb-3 flex items-baseline justify-between">
-            <h2 className="font-script text-lg">on this day</h2>
-            <span className="label">{formatShortDate(memory.date)}</span>
+            <h2 className="font-marker text-2xl"><span className="hl" style={{ "--hl": "var(--mint)" } as React.CSSProperties}>latest pages</span></h2>
+            <Link href="/timeline" transitionTypes={["nav-forward"]} className="label hover:text-ink">open the book →</Link>
           </div>
-          <div className="bento">
-            <EntryTile entry={memory} meId={me.id} forceSpan="wide" reveal={false} />
-          </div>
-          {onThisDay.length > 1 && <p className="label mt-3">+{onThisDay.length - 1} more from this day</p>}
+          {latest.length === 0 ? (
+            <p className="text-sm text-muted">nothing here yet — tap + to add your first moment.</p>
+          ) : (
+            <div className="bento">
+              {latest.map((e) => <EntryTile key={e.id} entry={e} meId={me.id} reveal={false} />)}
+            </div>
+          )}
         </section>
-      )}
-
-      <section className="mt-10">
-        <div className="mb-3 flex items-baseline justify-between">
-          <h2 className="font-script text-lg">latest pages</h2>
-          <Link href="/timeline" className="label hover:text-ink">open the book →</Link>
-        </div>
-        {latest.length === 0 ? (
-          <p className="text-sm text-muted">nothing here yet — tap + to add your first moment.</p>
-        ) : (
-          <div className="bento">
-            {latest.map((e) => <EntryTile key={e.id} entry={e} meId={me.id} reveal={false} />)}
-          </div>
-        )}
-      </section>
-    </main>
+      </main>
+    </Page>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { ViewTransition } from "react";
 import type { PhotoWithUrl } from "@/lib/entries";
 import { Icon } from "./icons";
 
@@ -31,6 +32,17 @@ export function PhotoSwiper({
     el.addEventListener("scroll", onScroll, { passive: true });
     return () => el.removeEventListener("scroll", onScroll);
   }, []);
+
+  // After a delete (or any change in the set), snap to a valid slide so an
+  // empty slot never lingers on screen.
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const next = Math.min(index, Math.max(0, count - 1));
+    if (next !== index) setIndex(next);
+    el.scrollTo({ left: next * el.clientWidth, behavior: "instant" as ScrollBehavior });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [count]);
 
   const go = useCallback(
     (d: number) => {
@@ -67,7 +79,6 @@ export function PhotoSwiper({
     setDeleting(true);
     try {
       await onDelete(current.id);
-      setIndex((i) => Math.max(0, Math.min(i, count - 2)));
     } finally {
       setDeleting(false);
       setConfirming(false);
@@ -76,18 +87,20 @@ export function PhotoSwiper({
 
   return (
     <div className="relative">
-      <div ref={ref} className="swiper bg-bg-soft">
+      <div ref={ref} className="swiper bg-bg-soft" style={{ height: "min(72vh, 640px)" }}>
         {photos.map((p, i) => (
           <div key={p.id} className="flex items-center justify-center" style={{ height: "min(72vh, 640px)" }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={p.url}
-              alt={p.caption ?? (count > 1 ? `${alt} (${i + 1} of ${count})` : alt)}
-              width={p.width}
-              height={p.height}
-              className="h-full w-full object-contain"
-              loading={i === 0 ? "eager" : "lazy"}
-            />
+            <ViewTransition name={`photo-${p.id}`} share="morph" default="none">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={p.url}
+                alt={p.caption ?? (count > 1 ? `${alt} (${i + 1} of ${count})` : alt)}
+                width={p.width}
+                height={p.height}
+                className="h-full w-full object-contain"
+                loading={i === 0 ? "eager" : "lazy"}
+              />
+            </ViewTransition>
           </div>
         ))}
       </div>

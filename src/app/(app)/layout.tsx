@@ -1,4 +1,5 @@
 import { Nav } from "@/components/nav";
+import { Doodles } from "@/components/ui";
 import { getCurrentProfile } from "@/lib/data";
 
 export default async function AppLayout({ children }: LayoutProps<"/">) {
@@ -7,7 +8,8 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
 
   return (
     <>
-      <div className="mx-auto w-full max-w-lg px-5 pb-32 sm:max-w-3xl">{children}</div>
+      <Doodles />
+      <div className="relative z-10 mx-auto w-full max-w-lg px-5 pb-32 sm:max-w-3xl">{children}</div>
       <Nav />
     </>
   );

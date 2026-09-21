@@ -10,7 +10,7 @@ export function LoginForm() {
   const [state, formAction, pending] = useActionState<LoginState, FormData>(signIn, {});
 
   return (
-    <form action={formAction} className="space-y-4">
+    <form action={formAction} className="space-y-4 text-left">
       <input
         name="password"
         type="password"
@@ -34,9 +34,9 @@ export function LoginForm() {
             name="person"
             value={p.key}
             disabled={pending}
-            className={`btn ${i === 0 ? "btn-primary" : "btn-soft"}`}
+            className={`btn ${i === 0 ? "btn-primary" : "btn-sky"}`}
           >
-            <Icon name="heart" size={16} /> I&apos;m {p.label}
+            <Icon name="heartFilled" size={16} /> I&apos;m {p.label}
           </button>
         ))}
       </div>

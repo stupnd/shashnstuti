@@ -152,3 +152,50 @@ export async function fetchPinnedEntries(): Promise<EntryCard[]> {
     .order("date", { ascending: false });
   return hydrate(supabase, (data ?? []) as unknown as RawEntry[]);
 }
+
+export type Slide = {
+  photoId: string;
+  entryId: string;
+  url: string;
+  caption: string | null;
+  title: string | null;
+  note: string;
+  place: string | null;
+  date: string;
+  width: number;
+  height: number;
+  milestone: boolean;
+};
+
+/** Every photo in a date range, oldest first, for Watch mode. */
+export async function fetchSlides(from?: string, to?: string): Promise<Slide[]> {
+  const supabase = await createClient();
+  let q = supabase
+    .from("entries")
+    .select("id, date, title, note, place, is_milestone, photos(id, storage_path, caption, width, height, sort_order)")
+    .order("date")
+    .order("created_at");
+  if (from) q = q.gte("date", from);
+  if (to) q = q.lt("date", to);
+  const { data } = await q;
+  const rows = data ?? [];
+  const paths = rows.flatMap((e) => (e.photos ?? []).map((p) => p.storage_path));
+  const urls = await signPhotoUrls(supabase, paths);
+  return rows.flatMap((e) =>
+    [...(e.photos ?? [])]
+      .sort((a, b) => a.sort_order - b.sort_order)
+      .map((p) => ({
+        photoId: p.id,
+        entryId: e.id,
+        url: urls.get(p.storage_path) ?? "",
+        caption: p.caption,
+        title: e.title,
+        note: e.note,
+        place: e.place,
+        date: e.date,
+        width: p.width,
+        height: p.height,
+        milestone: e.is_milestone,
+      })),
+  ).filter((s) => s.url);
+}

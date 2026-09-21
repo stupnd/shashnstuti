@@ -1,11 +1,15 @@
 "use client";
 
-import { useEffect, useRef, useState, useTransition } from "react";
+import Link from "next/link";
+import { useEffect, useRef, useState, useTransition, type CSSProperties } from "react";
+import { Icon } from "@/components/icons";
 import { EntryTile } from "@/components/entry-tile";
 import { EmptyNote } from "@/components/ui";
 import type { Cursor, EntryCard as EntryCardData } from "@/lib/entries";
 import { formatShortDate, relationshipYear, relationshipYearStart } from "@/lib/dates";
 import { loadMoreEntries } from "@/app/(app)/timeline/actions";
+
+const CHAPTER_HL = ["var(--butter)", "var(--mint)", "var(--sky)", "var(--lilac)", "var(--peach)", "var(--pink)"];
 
 /** Reveal-on-scroll for anything with .reveal inside the container. */
 function useReveal(deps: unknown[]) {
@@ -86,9 +90,14 @@ export function Timeline({
         const to = relationshipYearStart(startDate, ch.year + 1);
         return (
           <section key={ch.year}>
-            <header className="reveal mb-4 flex items-baseline justify-between">
-              <h2 className="font-script text-2xl">year {ch.year}</h2>
-              <p className="label">{formatShortDate(from)} — {formatShortDate(to)}</p>
+            <header className="mb-4 flex items-end justify-between gap-3">
+              <div>
+                <h2 className="font-marker text-3xl"><span className="hl" style={{ "--hl": CHAPTER_HL[ch.year % CHAPTER_HL.length] } as CSSProperties}>year {ch.year}</span></h2>
+                <p className="label mt-1">{formatShortDate(from)} — {formatShortDate(to)}</p>
+              </div>
+              <Link href={`/watch?year=${ch.year}`} transitionTypes={["nav-forward"]} className="btn btn-sky py-2 text-sm">
+                <Icon name="sparkle" size={15} /> watch
+              </Link>
             </header>
             <div className="bento">
               {ch.entries.map((e) => <EntryTile key={e.id} entry={e} meId={meId} />)}
@@ -99,7 +108,7 @@ export function Timeline({
       <div ref={sentinel} className="h-6" />
       {pending && <p className="label py-6 text-center">turning the page…</p>}
       {!cursor && entries.length > 0 && (
-        <p className="font-script py-8 text-center text-lg text-muted">the beginning</p>
+        <p className="font-marker py-8 text-center text-2xl text-muted">the beginning</p>
       )}
     </div>
   );
