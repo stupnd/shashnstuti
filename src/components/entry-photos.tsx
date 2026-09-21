@@ -1,20 +1,43 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { movePhotoToDate, removePhoto } from "@/lib/actions/entries";
 import type { Neighbor, PhotoWithUrl } from "@/lib/entries";
+import { EntryPinButton } from "./home-pins";
 import { PhotoSwiper } from "./photo-swiper";
 
 /** Entry-page viewer; wires the delete button to the server action for the author. */
-export function EntryPhotos({ photos, alt, canEdit, older, newer }: { photos: PhotoWithUrl[]; alt: string; canEdit: boolean; older: Neighbor | null; newer: Neighbor | null }) {
+export function EntryPhotos({
+  photos,
+  alt,
+  canEdit,
+  older,
+  newer,
+  pinnedIds,
+}: {
+  photos: PhotoWithUrl[];
+  alt: string;
+  canEdit: boolean;
+  older: Neighbor | null;
+  newer: Neighbor | null;
+  pinnedIds: string[];
+}) {
   const router = useRouter();
   const [list, setList] = useState(photos);
+  const [pinned, setPinned] = useState(() => new Set(pinnedIds));
   useEffect(() => setList(photos), [photos]);
+  useEffect(() => setPinned(new Set(pinnedIds)), [pinnedIds]);
+
+  const extraActions = (photo: PhotoWithUrl): ReactNode => (
+    <EntryPinButton photoId={photo.id} initiallyPinned={pinned.has(photo.id)} />
+  );
+
   return (
     <PhotoSwiper
       photos={list}
       alt={alt}
+      extraActions={extraActions}
       onEdge={
         older || newer
           ? (dir) => {

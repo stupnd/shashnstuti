@@ -10,6 +10,7 @@ import { getCurrentProfile } from "@/lib/data";
 
 import { fetchEntry, fetchNeighbors, fetchReactions, type Neighbor } from "@/lib/entries";
 import { formatShortDate } from "@/lib/dates";
+import { fetchPinnedPhotoIds } from "@/lib/home-pins";
 
 export const metadata: Metadata = { title: "moment" };
 
@@ -37,10 +38,16 @@ function NeighborCard({ n, label, dir }: { n: Neighbor | null; label: string; di
 
 export default async function EntryPage({ params }: PageProps<"/entry/[id]">) {
   const { id } = await params;
-  const [me, entry, reactions] = await Promise.all([getCurrentProfile(), fetchEntry(id), fetchReactions(id)]);
+  const [me, entry, reactions, pinnedIds] = await Promise.all([
+    getCurrentProfile(),
+    fetchEntry(id),
+    fetchReactions(id),
+    fetchPinnedPhotoIds(),
+  ]);
   if (!entry) notFound();
   const mine = entry.author === me.id;
   const { older, newer } = await fetchNeighbors(entry);
+  const entryPinned = entry.photos.filter((p) => pinnedIds.has(p.id)).map((p) => p.id);
 
   return (
     <Page>
@@ -53,7 +60,14 @@ export default async function EntryPage({ params }: PageProps<"/entry/[id]">) {
       </div>
 
       <div className="overflow-hidden rounded-3xl border-[3px] border-ink shadow-[5px_5px_0_var(--peach)]">
-        <EntryPhotos photos={entry.photos} alt={entry.title ?? entry.note ?? "photo"} canEdit={mine} older={older} newer={newer} />
+        <EntryPhotos
+          photos={entry.photos}
+          alt={entry.title ?? entry.note ?? "photo"}
+          canEdit={mine}
+          older={older}
+          newer={newer}
+          pinnedIds={entryPinned}
+        />
       </div>
 
       <article className="mt-6 space-y-6">

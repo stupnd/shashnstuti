@@ -42,3 +42,6 @@ next-env.d.ts
 
 # personal photos for the bulk import — never commit
 /import
+
+# supabase cli cache
+supabase/.temp/

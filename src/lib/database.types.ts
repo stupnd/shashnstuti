@@ -86,6 +86,13 @@ export type GameSession = {
   updated_by: string | null;
 };
 
+export type HomePin = {
+  photo_id: string;
+  pinned_by: string;
+  pinned_at: string;
+  sort_order: number;
+};
+
 export type LockedLetter = Pick<
   Letter,
   "id" | "title" | "author" | "unlock_at" | "created_at"
@@ -211,6 +218,27 @@ export type Database = {
         Insert: Optional<GameSession, "state" | "updated_at" | "updated_by">;
         Update: Partial<GameSession>;
         Relationships: [];
+      };
+      home_pins: {
+        Row: HomePin;
+        Insert: Optional<HomePin, "pinned_at" | "sort_order">;
+        Update: Partial<HomePin>;
+        Relationships: [
+          {
+            foreignKeyName: "home_pins_photo_id_fkey";
+            columns: ["photo_id"];
+            isOneToOne: true;
+            referencedRelation: "photos";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "home_pins_pinned_by_fkey";
+            columns: ["pinned_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          }
+        ];
       };
     };
     Views: Record<string, never>;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { ViewTransition } from "react";
 import type { PhotoWithUrl } from "@/lib/entries";
 import { Icon } from "./icons";
@@ -15,6 +15,7 @@ export function PhotoSwiper({
   onDelete,
   onMove,
   onEdge,
+  extraActions,
 }: {
   photos: PhotoWithUrl[];
   alt: string;
@@ -24,6 +25,8 @@ export function PhotoSwiper({
   onMove?: (photoId: string, date: string) => Promise<void>;
   /** Swiping past the last photo (or before the first) calls this. */
   onEdge?: (direction: "next" | "prev") => void;
+  /** Extra controls for the current photo (e.g. pin to home). */
+  extraActions?: (photo: PhotoWithUrl) => ReactNode;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(0);
@@ -185,6 +188,10 @@ export function PhotoSwiper({
             </button>
           )}
         </div>
+      )}
+
+      {extraActions && current && !confirming && !moving && (
+        <div className="absolute left-3 top-3 z-10">{extraActions(current)}</div>
       )}
       {moving && (
         <div className="pill absolute inset-x-3 top-3 flex flex-wrap items-center justify-between gap-2 py-2 pl-4 pr-2 text-sm">
