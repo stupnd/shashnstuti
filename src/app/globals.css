@@ -369,8 +369,9 @@ body::after {
   from { opacity: 0; transform: translateY(14px) scale(0.94) rotate(-2deg); }
   to { opacity: 1; transform: none; }
 }
+/* Don't set opacity:0 on the base rule — hover animations (e.g. .jelly) replace
+   this one and would otherwise snap cards back to invisible. */
 .stagger-in > * {
-  opacity: 0;
   animation: stagger-in 520ms var(--ease-pop) both;
 }
 .stagger-in > *:nth-child(1) { animation-delay: 40ms; }

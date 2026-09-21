@@ -15,7 +15,7 @@ function ActionCard({ href, icon, color, children }: { href: string; icon: IconN
       href={href}
       transitionTypes={["nav-forward"]}
       prefetch={href === "/random" ? false : undefined}
-      className="card jelly flex flex-col items-start justify-between p-4 transition-transform hover:-translate-y-1 hover:-rotate-1"
+      className="card flex flex-col items-start justify-between p-4 transition-transform hover:-translate-y-1 hover:-rotate-1"
       style={{ "--card-shadow": color } as React.CSSProperties}
     >
       <span className="sticker h-10 w-10" style={{ background: color }}><Icon name={icon} size={20} strokeWidth={2} /></span>
