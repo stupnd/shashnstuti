@@ -94,6 +94,36 @@ export type HomePin = {
   sort_order: number;
 };
 
+export type WishKind = "present" | "date";
+
+/** A planned date on the shared calendar. */
+export type Plan = {
+  id: string;
+  date: string; // YYYY-MM-DD
+  at_time: string | null; // HH:MM:SS, null = "sometime that day"
+  title: string;
+  note: string;
+  place: string | null;
+  created_by: string;
+  done_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+/** A present idea or a date idea, logged whenever one strikes. */
+export type Wish = {
+  id: string;
+  kind: WishKind;
+  title: string;
+  note: string;
+  url: string | null;
+  for_id: string | null;
+  created_by: string;
+  done_at: string | null;
+  done_by: string | null;
+  created_at: string;
+};
+
 export type LockedLetter = Pick<
   Letter,
   "id" | "title" | "author" | "unlock_at" | "created_at"
@@ -235,6 +265,47 @@ export type Database = {
           {
             foreignKeyName: "home_pins_pinned_by_fkey";
             columns: ["pinned_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      plans: {
+        Row: Plan;
+        Insert: Optional<
+          Plan,
+          "id" | "at_time" | "note" | "place" | "done_at" | "created_at" | "updated_at"
+        >;
+        Update: Partial<Plan>;
+        Relationships: [
+          {
+            foreignKeyName: "plans_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      wishes: {
+        Row: Wish;
+        Insert: Optional<
+          Wish,
+          "id" | "kind" | "note" | "url" | "for_id" | "done_at" | "done_by" | "created_at"
+        >;
+        Update: Partial<Wish>;
+        Relationships: [
+          {
+            foreignKeyName: "wishes_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "wishes_for_id_fkey";
+            columns: ["for_id"];
             isOneToOne: false;
             referencedRelation: "profiles";
             referencedColumns: ["id"];

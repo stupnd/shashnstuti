@@ -45,6 +45,37 @@ const P = {
     </>
   ),
   dice: <><rect x="4.5" y="4.5" width="15" height="15" rx="3" /><circle cx="8.5" cy="8.5" r=".9" fill="currentColor" /><circle cx="15.5" cy="8.5" r=".9" fill="currentColor" /><circle cx="12" cy="12" r=".9" fill="currentColor" /><circle cx="8.5" cy="15.5" r=".9" fill="currentColor" /><circle cx="15.5" cy="15.5" r=".9" fill="currentColor" /></>,
+  /** Wall calendar — the planner. */
+  calendar: (
+    <>
+      <rect x="3.8" y="6" width="16.4" height="14" rx="2.4" />
+      <path d="M3.8 10.2h16.4" />
+      <path d="M8.2 3.8v3.4M15.8 3.8v3.4" />
+      <circle cx="9" cy="14" r=".9" fill="currentColor" />
+      <circle cx="12.5" cy="14" r=".9" fill="currentColor" />
+      <circle cx="16" cy="14" r=".9" fill="currentColor" />
+      <circle cx="9" cy="17.2" r=".9" fill="currentColor" />
+    </>
+  ),
+  /** Wrapped present — the gift wishlist. */
+  gift: (
+    <>
+      <path d="M4.2 11.5h15.6V19a1 1 0 0 1-1 1H5.2a1 1 0 0 1-1-1Z" />
+      <path d="M3.4 8.2h17.2v3.3H3.4Z" />
+      <path d="M12 8.2V20" />
+      <path d="M12 8.2C10.6 5 9.2 3.6 7.8 4.2c-1.3.6-1 2.8.6 3.6.9.4 2.1.4 3.6.4Z" />
+      <path d="M12 8.2c1.4-3.2 2.8-4.6 4.2-4 1.3.6 1 2.8-.6 3.6-.9.4-2.1.4-3.6.4Z" />
+    </>
+  ),
+  /** Lightbulb — a date idea you just thought of. */
+  bulb: (
+    <>
+      <path d="M12 3.6a5.6 5.6 0 0 0-3.4 10.1c.6.5 1 1.2 1 2v.6h4.8v-.6c0-.8.4-1.5 1-2A5.6 5.6 0 0 0 12 3.6Z" />
+      <path d="M9.9 18.6h4.2M10.6 20.6h2.8" />
+    </>
+  ),
+  /** Clock face — the time on a planned date. */
+  clock: <><circle cx="12" cy="12" r="8.2" /><path d="M12 7.4V12l3.1 2" /></>,
   gear: <><circle cx="12" cy="12" r="3" /><path d="M12 3.5v2.3M12 18.2v2.3M3.5 12h2.3M18.2 12h2.3M6 6l1.6 1.6M16.4 16.4 18 18M6 18l1.6-1.6M16.4 7.6 18 6" /></>,
   plus: <path d="M12 5.5v13M5.5 12h13" />,
   back: <path d="M15.5 5.5 9 12l6.5 6.5" />,
