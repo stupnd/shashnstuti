@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Icon, type IconName } from "@/components/icons";
+import { MarkSeen } from "@/components/mark-seen";
 import { Timeline } from "@/components/timeline";
 import { Page, PageHeader } from "@/components/ui";
 import { getCurrentProfile, getSettings } from "@/lib/data";
@@ -20,6 +21,7 @@ export default async function TimelinePage() {
   return (
     <Page>
       <main className="animate-fade-up">
+        <MarkSeen section="book" />
         <PageHeader
           title="our book"
           caption="scroll to unfold · tap pin on a photo"

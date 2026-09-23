@@ -14,6 +14,10 @@ export type Profile = {
   avatar_emoji: string;
   /** Object key in the private `avatars` bucket, if they've uploaded a photo. */
   avatar_path: string | null;
+  /** Last time this person opened /messages — drives the nav badge. */
+  seen_messages_at: string;
+  /** Last time they opened the book. */
+  seen_book_at: string;
   created_at: string;
 };
 
@@ -152,7 +156,10 @@ export type Database = {
     Tables: {
       profiles: {
         Row: Profile;
-        Insert: Optional<Profile, "avatar_emoji" | "avatar_path" | "created_at">;
+        Insert: Optional<
+          Profile,
+          "avatar_emoji" | "avatar_path" | "seen_messages_at" | "seen_book_at" | "created_at"
+        >;
         Update: Partial<Profile>;
         Relationships: [];
       };

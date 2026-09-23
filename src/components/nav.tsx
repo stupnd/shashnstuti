@@ -19,7 +19,7 @@ const LEFT: { href: string; label: string; icon: IconName; color: string }[] = [
   { href: "/planner", label: "ideas", icon: "bulb", color: "var(--pink)" },
 ];
 
-type Tab = { href: string; label: string; icon: IconName; color: string; badgeKey?: "letters"; photo?: string | null };
+type Tab = { href: string; label: string; icon: IconName; color: string; badge?: number; photo?: string | null };
 
 /** Things you can make. The "+" used to go straight to /new (moments only). */
 const CREATE: { href: string; label: string; hint: string; icon: IconName; color: string }[] = [
@@ -31,12 +31,13 @@ const CREATE: { href: string; label: string; hint: string; icon: IconName; color
 
 function TabLink({
   href, label, icon, color, active, badge, photo,
-}: Tab & { active: boolean; badge?: number }) {
-  const hasBadge = (badge ?? 0) > 0;
+}: Tab & { active: boolean }) {
+  // An open tab has by definition just been read.
+  const hasBadge = !active && (badge ?? 0) > 0;
   return (
     <Link
       href={href}
-      aria-label={hasBadge ? `${label}, ${badge} unopened` : label}
+      aria-label={hasBadge ? `${label}, ${badge} new` : label}
       aria-current={active ? "page" : undefined}
       className={`relative flex h-12 w-11 flex-col items-center justify-center gap-0.5 rounded-2xl ${active ? "nav-active" : ""}`}
       style={{ background: active ? color : "transparent", color: active ? "var(--ink)" : "var(--muted)" } as CSSProperties}
@@ -63,12 +64,13 @@ function TabLink({
 }
 
 export function Nav({
-  unopenedLetters = 0,
+  unread,
   avatar,
   avatarUrl,
   name,
 }: {
-  unopenedLetters?: number;
+  /** What's arrived from the other person since you last looked. */
+  unread?: { messages: number; book: number };
   /** The signed-in person's doodle, used when they haven't set a photo. */
   avatar?: string | null;
   /** Their profile photo, if they've picked one. */
@@ -89,7 +91,7 @@ export function Nav({
 
   const RIGHT: Tab[] = [
     { href: "/planner/calendar", label: "dates", icon: "calendar", color: "var(--sky)" },
-    { href: "/messages", label: "notes", icon: "chat", color: "var(--lilac)" },
+    { href: "/messages", label: "notes", icon: "chat", color: "var(--lilac)", badge: unread?.messages },
     { href: "/settings", label: name ?? "you", icon: iconFor(avatar, "gear"), color: "var(--peach)", photo: avatarUrl ?? null },
   ];
 
@@ -150,7 +152,14 @@ export function Nav({
         )}
 
         <div className="pill flex items-center gap-0.5 p-1.5">
-          {LEFT.map((t) => <TabLink key={t.href} {...t} active={isActive(t.href)} />)}
+          {LEFT.map((t) => (
+            <TabLink
+              key={t.href}
+              {...t}
+              active={isActive(t.href)}
+              badge={t.href === "/timeline" ? unread?.book : undefined}
+            />
+          ))}
 
           <button
             type="button"
@@ -163,14 +172,7 @@ export function Nav({
             <Icon name={creating ? "close" : "plus"} size={creating ? 20 : 24} strokeWidth={2.4} />
           </button>
 
-          {RIGHT.map((t) => (
-            <TabLink
-              key={t.href}
-              {...t}
-              active={isActive(t.href)}
-              badge={t.badgeKey === "letters" ? unopenedLetters : undefined}
-            />
-          ))}
+          {RIGHT.map((t) => <TabLink key={t.href} {...t} active={isActive(t.href)} />)}
         </div>
       </nav>
     </>

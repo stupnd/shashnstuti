@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { MarkSeen } from "@/components/mark-seen";
 import { ThoughtsBoard } from "@/components/thoughts-board";
 import { Page, PageHeader } from "@/components/ui";
 import { getCurrentProfile, getPartner } from "@/lib/data";
@@ -16,6 +17,7 @@ export default async function MessagesPage() {
   return (
     <Page>
       <main className="animate-fade-up">
+        <MarkSeen section="messages" />
         <PageHeader
           title="messages"
           caption={partner ? `you & ${partner.display_name}` : "waiting for your person"}
