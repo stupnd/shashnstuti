@@ -21,6 +21,16 @@ export type Settings = {
   updated_at: string;
 };
 
+export type PushSubscriptionRow = {
+  endpoint: string;
+  user_id: string;
+  p256dh: string;
+  auth: string;
+  user_agent: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
 export type Entry = {
   id: string;
   date: string; // YYYY-MM-DD
@@ -306,6 +316,20 @@ export type Database = {
           {
             foreignKeyName: "wishes_for_id_fkey";
             columns: ["for_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      push_subscriptions: {
+        Row: PushSubscriptionRow;
+        Insert: Optional<PushSubscriptionRow, "user_agent" | "created_at" | "updated_at">;
+        Update: Partial<PushSubscriptionRow>;
+        Relationships: [
+          {
+            foreignKeyName: "push_subscriptions_user_id_fkey";
+            columns: ["user_id"];
             isOneToOne: false;
             referencedRelation: "profiles";
             referencedColumns: ["id"];

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { LetterNotifToggle } from "@/components/letter-notif-toggle";
+import { PushNotifToggle } from "@/components/push-notif-toggle";
 import { ReplayOnboardingButton } from "@/components/onboarding";
 import { ThemeToggle } from "@/components/theme";
 import { Page, PageHeader } from "@/components/ui";
@@ -34,16 +34,16 @@ export default async function SettingsPage() {
           <SpotifyForm spotifyUrl={settings.spotify_url} />
         </section>
 
+        <section className="card p-5" style={{ "--card-shadow": "var(--sky)" } as React.CSSProperties}>
+          <p className="label mb-3">alerts</p>
+          <PushNotifToggle />
+        </section>
+
         <section className="card p-5" style={{ "--card-shadow": "var(--lilac)" } as React.CSSProperties}>
           <p className="label mb-3">intro</p>
           <p className="mb-3 font-marker text-xl leading-tight">need a refresher?</p>
           <p className="mb-4 text-sm text-muted">walk through the sections again — home, book, letters, play, and the rest.</p>
           <ReplayOnboardingButton />
-        </section>
-
-        <section className="card p-5" style={{ "--card-shadow": "var(--sky)" } as React.CSSProperties}>
-          <p className="label mb-3">alerts</p>
-          <LetterNotifToggle />
         </section>
 
         <section className="card p-5" style={{ "--card-shadow": "var(--pink)" } as React.CSSProperties}>

@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile, getPartner } from "@/lib/data";
+import { notifyPartner } from "@/lib/push";
 
 export type LetterState = { error?: string };
 
@@ -25,6 +26,13 @@ export async function writeLetter(_prev: LetterState, formData: FormData): Promi
     .from("letters")
     .insert({ title, body, author: me.id, recipient: partner.id, unlock_at });
   if (error) return { error: error.message };
+
+  await notifyPartner(partner.id, {
+    title: "you've got mail ♡",
+    body: title,
+    url: "/letters",
+    tag: "letter",
+  });
 
   revalidatePath("/letters");
   redirect("/letters");

@@ -3,8 +3,9 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getCurrentProfile } from "@/lib/data";
+import { getCurrentProfile, getPartner } from "@/lib/data";
 import { geocode } from "@/lib/geocode";
+import { notifyPartner } from "@/lib/push";
 import type { DateSource } from "@/lib/database.types";
 
 export type EntryInput = {
@@ -46,7 +47,7 @@ function revalidateAll() {
 }
 
 export async function createEntry(input: EntryInput): Promise<{ id: string }> {
-  const me = await getCurrentProfile();
+  const [me, partner] = await Promise.all([getCurrentProfile(), getPartner()]);
   const supabase = await createClient();
   const fields = clean(input);
   const loc = await resolveLocation(fields.place, input.fallbackLatLng);
@@ -57,6 +58,14 @@ export async function createEntry(input: EntryInput): Promise<{ id: string }> {
     .select("id")
     .single();
   if (error) throw new Error(error.message);
+
+  await notifyPartner(partner?.id, {
+    title: "new moment in the book",
+    body: fields.title || fields.note?.slice(0, 80) || `${me.display_name} added a page`,
+    url: `/entry/${data.id}`,
+    tag: `moment-${data.id}`,
+  });
+
   revalidateAll();
   return { id: data.id };
 }

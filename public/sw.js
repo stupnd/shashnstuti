@@ -1,7 +1,6 @@
-/* Minimal service worker: makes the app installable, caches shell static
-   assets, and routes letter notification taps to /letters. Pages and photos
-   always go to the network (signed URLs expire, and we never want a stale timeline). */
-const CACHE = "us-static-v1";
+/* Makes the app installable, caches shell static assets, and handles
+   Web Push + notification taps. Pages/photos always hit the network. */
+const CACHE = "us-static-v2";
 
 self.addEventListener("install", () => {
   self.skipWaiting();
@@ -32,14 +31,41 @@ self.addEventListener("fetch", (e) => {
   );
 });
 
+self.addEventListener("push", (e) => {
+  let data = { title: "our scrapbook", body: "something new for you", url: "/", tag: "scrapbook" };
+  try {
+    if (e.data) data = { ...data, ...e.data.json() };
+  } catch {
+    try {
+      const text = e.data && e.data.text();
+      if (text) data.body = text;
+    } catch {
+      /* ignore */
+    }
+  }
+
+  e.waitUntil(
+    self.registration.showNotification(data.title || "our scrapbook", {
+      body: data.body || "",
+      icon: "/icons/icon-192.png",
+      badge: "/icons/icon-192.png",
+      tag: data.tag || "scrapbook",
+      data: { url: data.url || "/" },
+      renotify: true,
+    }),
+  );
+});
+
 self.addEventListener("notificationclick", (e) => {
   e.notification.close();
-  const target = (e.notification.data && e.notification.data.url) || "/letters";
+  const target = (e.notification.data && e.notification.data.url) || "/";
   e.waitUntil(
     self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clients) => {
       for (const client of clients) {
         if ("focus" in client) {
-          if (client.navigate) client.navigate(target);
+          if (client.url.includes(self.location.origin) && "navigate" in client) {
+            return client.navigate(target).then((c) => (c && c.focus ? c.focus() : client.focus()));
+          }
           return client.focus();
         }
       }

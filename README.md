@@ -34,8 +34,13 @@ Supabase account per person (`src/lib/people.ts`) is signed in so Row Level Secu
 2. vercel.com → Add New Project → import the repo. Framework is auto-detected.
 3. **Environment variables** (Production + Preview):
    `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`,
-   `APP_PASSWORD`, `AUTH_SECRET`, `NEXT_PUBLIC_SITE_URL` (= your vercel URL).
+   `APP_PASSWORD`, `AUTH_SECRET`, `NEXT_PUBLIC_SITE_URL` (= your vercel URL),
+   plus push keys `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`.
 4. Deploy. Then on your phones: open the URL in Safari → Share → **Add to Home Screen**.
+5. **Push notifications** (optional): generate keys with `npx web-push generate-vapid-keys`, add
+   `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, and `VAPID_SUBJECT` to Vercel env (same keys
+   forever). Each person opens the home-screen app → settings → turn **push pings** on.
+   iPhone needs iOS 16.4+ and the app added to the Home Screen (not just Safari tab).
 
 ## Project layout
 

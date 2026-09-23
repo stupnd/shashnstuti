@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile, getPartner } from "@/lib/data";
+import { notifyPartner } from "@/lib/push";
 import {
   emptyThoughts,
   MAX_THOUGHT_LEN,
@@ -53,6 +54,12 @@ export async function sendThought(raw: string): Promise<{ ok: true; thought: Tho
     items: [thought, ...current.items].slice(0, MAX_THOUGHTS),
   };
   await writeState(next);
+  await notifyPartner(partner.id, {
+    title: `${me.display_name} is thinking of you`,
+    body: body.length > 80 ? `${body.slice(0, 77)}…` : body,
+    url: "/",
+    tag: "thought",
+  });
   revalidatePath("/");
   return { ok: true, thought };
 }
