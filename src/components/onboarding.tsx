@@ -87,7 +87,7 @@ function FeatureRow({ feature, onPick }: { feature: Feature; onPick: () => void 
         href={feature.href}
         transitionTypes={["nav-forward"]}
         onClick={onPick}
-        className="flex items-center gap-3 rounded-2xl border-2 border-ink bg-surface px-3 py-2.5 shadow-[3px_3px_0_var(--row)] transition-transform hover:-translate-y-0.5"
+        className="flex items-center gap-3 rounded-2xl border-[1.5px] border-line bg-surface px-3 py-2.5 shadow-[3px_3px_0_var(--row)] transition-transform hover:-translate-y-0.5"
         style={{ ["--row" as string]: feature.color }}
       >
         {inner}
@@ -97,7 +97,7 @@ function FeatureRow({ feature, onPick }: { feature: Feature; onPick: () => void 
 
   return (
     <div
-      className="flex items-center gap-3 rounded-2xl border-2 border-ink bg-surface px-3 py-2.5 shadow-[3px_3px_0_var(--row)]"
+      className="flex items-center gap-3 rounded-2xl border-[1.5px] border-line bg-surface px-3 py-2.5 shadow-[3px_3px_0_var(--row)]"
       style={{ ["--row" as string]: feature.color }}
     >
       {inner}
@@ -176,12 +176,10 @@ export function Onboarding({ name }: { name: string }) {
               <span className="sticker bob mx-auto h-16 w-16 bg-pink text-accent">
                 <Icon name="heart" size={30} strokeWidth={2.2} />
               </span>
-              <h2 id={titleId} className="font-marker mt-4 text-[2rem] leading-tight sm:text-[2.35rem]">
-                <span className="hl" style={{ ["--hl" as string]: "var(--butter)" }}>
-                  hi {greet}!
-                </span>
+              <h2 id={titleId} className="font-semibold tracking-tight mt-4 text-[2rem] leading-tight sm:text-[2.35rem]">
+                hi {greet}!
               </h2>
-              <p className="font-marker mt-2 text-2xl leading-tight text-ink/90">welcome to our scrapbook</p>
+              <p className="font-semibold tracking-tight mt-2 text-2xl leading-tight text-ink/90">welcome to our scrapbook</p>
               <p className="mx-auto mt-3 max-w-xs text-sm text-muted">
                 a private little book for the two of you — moments, letters, maps, games, and more.
               </p>
@@ -190,10 +188,8 @@ export function Onboarding({ name }: { name: string }) {
 
           {step === 1 && (
             <div>
-              <h2 id={titleId} className="font-marker text-[1.85rem] leading-tight">
-                <span className="hl" style={{ ["--hl" as string]: "var(--mint)" }}>
-                  the main spots
-                </span>
+              <h2 id={titleId} className="font-semibold tracking-tight text-[1.85rem] leading-tight">
+                the main spots
               </h2>
               <p className="label mt-2">along the bottom bar</p>
               <div className="stagger-in mt-4 grid gap-2.5">
@@ -206,10 +202,8 @@ export function Onboarding({ name }: { name: string }) {
 
           {step === 2 && (
             <div>
-              <h2 id={titleId} className="font-marker text-[1.85rem] leading-tight">
-                <span className="hl" style={{ ["--hl" as string]: "var(--sky)" }}>
-                  play &amp; peek
-                </span>
+              <h2 id={titleId} className="font-semibold tracking-tight text-[1.85rem] leading-tight">
+                play &amp; peek
               </h2>
               <p className="label mt-2">extra treats from home</p>
               <div className="stagger-in mt-4 grid gap-2.5">

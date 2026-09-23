@@ -27,7 +27,7 @@ export function PlayShell({
           live
         </span>
       </div>
-      <h1 className="font-marker text-[2rem] leading-tight">
+      <h1 className="font-semibold tracking-tight text-[2rem] leading-tight">
         <span className="hl" style={{ ["--hl" as string]: color }}>{title}</span>
       </h1>
       <div className="mt-6 flex-1">{children}</div>

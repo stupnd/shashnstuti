@@ -9,7 +9,7 @@ export function SetupNote() {
           <Icon name="calendar" size={20} />
         </span>
         <div className="min-w-0">
-          <h2 className="font-marker text-2xl leading-tight">one more step</h2>
+          <h2 className="font-semibold tracking-tight text-2xl leading-tight">one more step</h2>
           <p className="mt-1 text-sm text-muted">
             The planner tables aren&apos;t in Supabase yet. Open the SQL editor and run{" "}
             <code className="rounded bg-bg-soft px-1 py-0.5 text-xs">

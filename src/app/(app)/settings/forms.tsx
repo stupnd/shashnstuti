@@ -1,8 +1,9 @@
 "use client";
 
+import { AvatarPicker } from "@/components/avatar-picker";
 import { useActionState, useState } from "react";
 import { AVATARS, Icon, iconFor } from "@/components/icons";
-import type { Profile } from "@/lib/database.types";
+import type { Person } from "@/lib/database.types";
 import { updateProfile, updateSpotifyUrl, updateStartDate, type SettingsState } from "./actions";
 
 function Status({ state }: { state: SettingsState }) {
@@ -11,7 +12,7 @@ function Status({ state }: { state: SettingsState }) {
   return null;
 }
 
-export function ProfileForm({ profile }: { profile: Profile }) {
+export function ProfileForm({ profile }: { profile: Person }) {
   const [state, action, pending] = useActionState(updateProfile, {});
   const [avatar, setAvatar] = useState(iconFor(profile.avatar_emoji));
 
@@ -22,8 +23,11 @@ export function ProfileForm({ profile }: { profile: Profile }) {
         <input name="display_name" defaultValue={profile.display_name} className="input mt-2" maxLength={40} required />
       </label>
 
+      <AvatarPicker currentUrl={profile.avatar_url} fallbackIcon={profile.avatar_emoji} />
+
       <div>
         <span className="label">your doodle</span>
+        <p className="mb-1 mt-0.5 text-xs text-muted">used wherever you haven&apos;t got a photo</p>
         <div className="mt-2 flex flex-wrap gap-2">
           {AVATARS.map((a) => (
             <button key={a} type="button" onClick={() => setAvatar(a)} aria-pressed={avatar === a} aria-label={a} className="chip chip-icon">

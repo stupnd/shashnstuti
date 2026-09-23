@@ -41,9 +41,7 @@ export function Scoreboard({
   return (
     <section className="card mt-8 p-5" style={{ ["--card-shadow" as string]: "var(--peach)" }}>
       <div className="flex items-baseline justify-between gap-3">
-        <h2 className="font-marker text-2xl">
-          <span className="hl" style={{ ["--hl" as string]: "var(--peach)" }}>scoreboard</span>
-        </h2>
+        <h2 className="font-semibold tracking-tight text-2xl"><span className="ul">scoreboard</span></h2>
         {hasAny && (
           <button type="button" className="label hover:text-ink" onClick={() => void resetAll()}>
             reset
@@ -59,13 +57,13 @@ export function Scoreboard({
             {totals.map((p, i) => (
               <div
                 key={p.id}
-                className={`flex flex-1 flex-col items-center rounded-2xl border-2 border-ink px-3 py-4 ${
+                className={`flex flex-1 flex-col items-center rounded-2xl border-[1.5px] border-line px-3 py-4 ${
                   leader?.id === p.id ? "bg-butter" : "bg-surface"
                 }`}
               >
                 <Avatar value={p.avatar} size={28} />
                 <p className="mt-2 max-w-full truncate text-sm font-semibold">{p.name}</p>
-                <p className="font-marker mt-1 text-4xl leading-none">{p.tallies.wins}</p>
+                <p className="font-semibold tracking-tight mt-1 text-4xl leading-none">{p.tallies.wins}</p>
                 <p className="label mt-1">wins</p>
                 <p className="mt-2 text-[11px] text-muted">
                   {p.tallies.losses}L · {p.tallies.draws}D

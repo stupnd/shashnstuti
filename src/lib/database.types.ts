@@ -10,9 +10,15 @@ export type Profile = {
   id: string;
   email: string;
   display_name: string;
+  /** Hand-drawn icon key, used when no photo is set. */
   avatar_emoji: string;
+  /** Object key in the private `avatars` bucket, if they've uploaded a photo. */
+  avatar_path: string | null;
   created_at: string;
 };
+
+/** A profile plus a signed URL for its photo (see getProfiles). */
+export type Person = Profile & { avatar_url: string | null };
 
 export type Settings = {
   id: number;
@@ -146,7 +152,7 @@ export type Database = {
     Tables: {
       profiles: {
         Row: Profile;
-        Insert: Optional<Profile, "avatar_emoji" | "created_at">;
+        Insert: Optional<Profile, "avatar_emoji" | "avatar_path" | "created_at">;
         Update: Partial<Profile>;
         Relationships: [];
       };

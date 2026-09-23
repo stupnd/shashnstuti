@@ -31,24 +31,27 @@
 
 .dark {
   --bg: #16121c;
-  --bg-soft: #1e1826;
-  --surface: #2a2233;
+  --bg-soft: #201a29;
+  --surface: #2b2235;
   --ink: #f6eef7;
   --muted: #b5a8bc;
-  --line: #3d3348;
-  --accent: #ff7aa2;
-  --accent-deep: #ff5c8a;
-  --accent-soft: #4a2a38;
-  --violet: #a78bfa;
-  --peach: #6b4a3d;
-  --butter: #6b5c2a;
-  --mint: #2f5246;
-  --sky: #2a4560;
-  --lilac: #4a3a66;
-  --pink: #5c3450;
-  --blob-a: #4a2a38;
-  --blob-b: #2a4560;
-  --blob-c: #4a3a66;
+  --line: #443a52;
+  --accent: #ff6b96;
+  --accent-deep: #ff4d80;
+  --accent-soft: #6b2442;
+  --violet: #b494ff;
+  /* Deep but properly saturated — the old set sat near grey, which is why
+     everything looked washed out at night. Luminance is kept low enough that
+     near-white ink still reads on top. */
+  --peach: #9c4e30;
+  --butter: #9a7616;
+  --mint: #16705a;
+  --sky: #17588c;
+  --lilac: #5a3da8;
+  --pink: #9c2f6b;
+  --blob-a: #6b2448;
+  --blob-b: #1b4a74;
+  --blob-c: #5a3da8;
   --theme-meta: #16121c;
   color-scheme: dark;
 }
@@ -99,7 +102,9 @@ body {
   transition: background-color 350ms ease, color 350ms ease;
 }
 
-/* Soft candy blobs + paper grain behind everything */
+/* One still, warm wash behind everything. No animation, no grain: this layer
+   used to run an 18s gradient loop under a blend-mode noise overlay on every
+   screen, which is most of why phones felt sluggish. */
 body::before {
   content: "";
   position: fixed;
@@ -107,25 +112,8 @@ body::before {
   z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 55% 40% at 12% 18%, color-mix(in oklab, var(--blob-a) 70%, transparent), transparent 70%),
-    radial-gradient(ellipse 50% 45% at 88% 12%, color-mix(in oklab, var(--blob-b) 65%, transparent), transparent 70%),
-    radial-gradient(ellipse 60% 40% at 70% 88%, color-mix(in oklab, var(--blob-c) 55%, transparent), transparent 70%),
-    radial-gradient(ellipse 40% 35% at 20% 78%, color-mix(in oklab, var(--mint) 45%, transparent), transparent 70%);
-  animation: blob-drift 18s ease-in-out infinite alternate;
-}
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  opacity: 0.35;
-  mix-blend-mode: multiply;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.17 0 0 0 0 0.13 0 0 0 0 0.2 0 0 0 0.12 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
-}
-.dark body::after {
-  opacity: 0.22;
-  mix-blend-mode: soft-light;
+    radial-gradient(ellipse 70% 50% at 15% 0%, color-mix(in oklab, var(--blob-a) 55%, transparent), transparent 70%),
+    radial-gradient(ellipse 60% 45% at 90% 5%, color-mix(in oklab, var(--blob-b) 45%, transparent), transparent 70%);
 }
 
 .font-marker { font-family: var(--font-marker); }
@@ -142,6 +130,13 @@ body::after {
 
 /* Marker title with a pastel highlighter swipe behind it. */
 .hl { position: relative; display: inline-block; z-index: 0; }
+/* Quieter sibling of .hl for section headings: a pastel underline rather than
+   a full highlighter swipe, so colour survives without the marker-pen look. */
+.ul { position: relative; display: inline-block; }
+.ul::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: -0.15em; height: 0.28em;
+  background: var(--ul, var(--butter)); border-radius: 0.3em; z-index: -1;
+}
 .hl::before {
   content: ""; position: absolute; z-index: -1;
   left: -0.15em; right: -0.15em; bottom: 0.08em; height: 0.5em;
@@ -150,15 +145,17 @@ body::after {
   transition: background-color 350ms ease;
 }
 
-/* Hand-drawn icon wobble (filter lives in RoughFilter). */
-.doodle { filter: url(#rough); }
+/* The hand-drawn wobble used to be an SVG displacement filter on every icon,
+   which forces each one off the GPU fast path. The icons are already drawn
+   loose, so the filter bought very little for a lot of paint cost. */
+.doodle { }
 
 /* ---- Sticker surfaces --------------------------------------------------- */
 .card {
   background: var(--surface);
-  border: 2px solid var(--ink);
+  border: 1.5px solid var(--line);
   border-radius: 1.4rem;
-  box-shadow: 4px 4px 0 var(--card-shadow, var(--peach));
+  box-shadow: 2px 2px 0 var(--card-shadow, var(--line));
   transition: background-color 350ms ease, border-color 350ms ease, transform 200ms var(--ease-pop), box-shadow 200ms;
 }
 .card-soft {
@@ -173,7 +170,7 @@ body::after {
   backdrop-filter: blur(10px);
   border: 2px solid var(--ink);
   border-radius: 999px;
-  box-shadow: 4px 4px 0 var(--pink);
+  box-shadow: 2px 2px 0 var(--line);
   transition: background-color 350ms ease, border-color 350ms ease, box-shadow 350ms ease;
 }
 .dashed {
@@ -184,10 +181,11 @@ body::after {
 .sticker {
   display: inline-flex; align-items: center; justify-content: center;
   border-radius: 999px; background: var(--surface); border: 2px solid var(--ink);
-  box-shadow: 2px 2px 0 var(--ink);
+  box-shadow: 1px 1px 0 var(--line);
   transition: transform 200ms var(--ease-pop), background-color 350ms ease;
 }
-.sticker:hover { transform: scale(1.08) rotate(-6deg); }
+@media (hover: hover) { .sticker:hover { transform: scale(1.06) rotate(-4deg); } }
+.sticker:active { transform: scale(0.95); }
 
 /* ---- Controls ---------------------------------------------------------- */
 .input {
@@ -209,20 +207,20 @@ body::after {
   border-radius: 999px; padding: 0.75rem 1.3rem;
   font-weight: 600; font-size: 0.95rem;
   border: 2px solid var(--ink);
-  box-shadow: 3px 3px 0 var(--ink);
+  box-shadow: 2px 2px 0 var(--ink);
   transition: transform 120ms var(--ease-pop), box-shadow 120ms, background-color 150ms, opacity 150ms, color 150ms;
   user-select: none;
 }
-.btn:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+@media (hover: hover) { .btn:hover { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink); } }
 .btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
 .btn:disabled { opacity: 0.45; pointer-events: none; }
 .btn-primary { background: var(--accent); color: #fff; }
-.btn-primary:hover { background: var(--accent-deep); }
+@media (hover: hover) { .btn-primary:hover { background: var(--accent-deep); } }
 .btn-soft { background: var(--butter); color: var(--ink); }
 .btn-mint { background: var(--mint); color: var(--ink); }
 .btn-sky { background: var(--sky); color: var(--ink); }
 .btn-ghost { background: transparent; color: var(--muted); border-color: transparent; box-shadow: none; }
-.btn-ghost:hover { color: var(--ink); transform: none; box-shadow: none; }
+@media (hover: hover) { .btn-ghost:hover { color: var(--ink); transform: none; box-shadow: none; } }
 
 /* Selectable chip / icon button */
 .chip {
@@ -231,7 +229,8 @@ body::after {
   border-radius: 999px; padding: 0.4rem 0.9rem; font-size: 0.85rem; font-weight: 600;
   transition: transform 150ms var(--ease-pop), background-color 150ms;
 }
-.chip:hover { transform: translateY(-2px) rotate(-1deg); }
+@media (hover: hover) { .chip:hover { transform: translateY(-2px); } }
+.chip:active { transform: scale(0.96); }
 .chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
 .chip-icon { padding: 0; width: 2.75rem; height: 2.75rem; }
 .chip-icon[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
@@ -257,19 +256,18 @@ body::after {
 .tile {
   position: relative; overflow: hidden; border-radius: 1.25rem;
   background: var(--surface);
-  border: 3px solid var(--tile, var(--peach));
-  box-shadow: 4px 4px 0 var(--tile, var(--peach));
+  border: 2px solid var(--tile, var(--line));
+  box-shadow: 2px 2px 0 var(--tile, var(--line));
   transform: rotate(var(--tilt, 0deg));
   transition: transform 350ms var(--ease-pop), box-shadow 200ms, background-color 350ms ease;
 }
-.tile:hover { transform: rotate(0deg) scale(1.03); box-shadow: 6px 6px 0 var(--tile, var(--peach)); z-index: 1; }
+.tile:active { transform: rotate(0deg) scale(0.985); }
 .tile img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; }
 .tile-strip {
   position: absolute; inset-x: 0; bottom: 0;
   left: 0; right: 0;
-  background: color-mix(in oklab, var(--surface) 92%, transparent);
-  backdrop-filter: blur(6px);
-  border-top: 2px solid var(--tile, var(--peach));
+  background: var(--surface);
+  border-top: 2px solid var(--tile, var(--line));
   padding: 0.35rem 0.6rem 0.4rem;
 }
 
@@ -286,7 +284,7 @@ body::after {
 .reveal.in-view { animation: pop-in 600ms var(--ease-pop) both; animation-delay: var(--delay, 0ms); }
 
 @keyframes wiggle { 0%,100% { rotate: -3deg; } 50% { rotate: 3deg; } }
-.wiggle:hover { animation: wiggle 400ms ease-in-out infinite; }
+@media (hover: hover) { .wiggle:hover { animation: wiggle 400ms ease-in-out infinite; } }
 
 @keyframes float {
   0%,100% { transform: translateY(0) rotate(var(--r, 0deg)); }
@@ -312,11 +310,6 @@ body::after {
 @keyframes draw { to { stroke-dashoffset: 0; } }
 .squiggle path { stroke-dasharray: 600; stroke-dashoffset: 600; animation: draw 1.6s ease-out forwards; }
 
-@keyframes blob-drift {
-  0%   { transform: translate(0, 0) scale(1); }
-  100% { transform: translate(-2%, 3%) scale(1.05); }
-}
-
 @keyframes heartbeat {
   0%, 100% { transform: scale(1); }
   14% { transform: scale(1.18); }
@@ -324,13 +317,13 @@ body::after {
   42% { transform: scale(1.12); }
   70% { transform: scale(1); }
 }
-.heartbeat { animation: heartbeat 1.6s ease-in-out infinite; display: inline-block; }
+.heartbeat { animation: heartbeat 1.6s ease-in-out 3; display: inline-block; }
 
 @keyframes sparkle-pulse {
   0%, 100% { opacity: 0.55; transform: scale(1) rotate(0deg); }
   50% { opacity: 1; transform: scale(1.18) rotate(12deg); }
 }
-.sparkle-pulse { animation: sparkle-pulse 2.4s ease-in-out infinite; }
+.sparkle-pulse { animation: none; }
 
 @keyframes jelly {
   0% { transform: scale(1, 1); }
@@ -339,31 +332,33 @@ body::after {
   70% { transform: scale(1.04, 0.97); }
   100% { transform: scale(1, 1); }
 }
-.jelly:hover { animation: jelly 520ms var(--ease-pop); }
+@media (hover: hover) { .jelly:hover { animation: jelly 520ms var(--ease-pop); } }
+.jelly:active { transform: scale(0.99); }
 
 @keyframes bob {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-5px); }
 }
-.bob { animation: bob 2.8s ease-in-out infinite; }
+/* bob/shimmy/twinkle used to loop forever on every screen; now one-shot. */
+.bob { animation: bob 2.8s ease-in-out 3; }
 
 @keyframes shimmy {
   0%, 100% { transform: rotate(-1.5deg); }
   50% { transform: rotate(1.5deg); }
 }
-.shimmy { animation: shimmy 4.5s ease-in-out infinite; }
+.shimmy { animation: none; }
 
 @keyframes twinkle {
   0%, 100% { opacity: 0.2; transform: scale(0.7); }
   50% { opacity: 1; transform: scale(1.15); }
 }
-.twinkle { animation: twinkle 2.2s ease-in-out infinite; }
+.twinkle { animation: none; }
 
 @keyframes soft-glow {
-  0%, 100% { box-shadow: 4px 4px 0 var(--card-shadow, var(--peach)); }
+  0%, 100% { box-shadow: 2px 2px 0 var(--card-shadow, var(--line)); }
   50% { box-shadow: 4px 4px 0 var(--card-shadow, var(--peach)), 0 0 28px color-mix(in oklab, var(--accent) 35%, transparent); }
 }
-.soft-glow { animation: soft-glow 3.2s ease-in-out infinite; }
+.soft-glow { animation: soft-glow 3.2s ease-in-out 2; }
 
 @keyframes stagger-in {
   from { opacity: 0; transform: translateY(14px) scale(0.94) rotate(-2deg); }
@@ -456,3 +451,44 @@ body::after {
 .slide-fade { animation: slide-fade 900ms ease-out both; }
 @keyframes type-in { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 0 0 0); } }
 .type-in { animation: type-in 1.4s steps(28) 500ms both; }
+
+/* ---- Touch ergonomics --------------------------------------------------- */
+/* Small icon buttons (remove, edit, dismiss) look tiny by design but must
+   still be comfortably tappable — Apple's floor is 44px. The padding is
+   invisible; only the hit area grows. */
+.tap {
+  position: relative;
+}
+.tap::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 44px;
+  height: 44px;
+  transform: translate(-50%, -50%);
+}
+
+/* Stop iOS leaving :hover stuck on after a tap. */
+@media (hover: none) {
+  .tile:hover, .card:hover, .chip:hover, .btn:hover, .sticker:hover { transform: none; }
+}
+
+/* ---- Nav tab labels ------------------------------------------------------
+   Fredoka is a wide, rounded display face — at 8px in a 44px cell the labels
+   ran into each other. The system UI stack (SF Pro on your phones) is drawn
+   for exactly this size, and costs no extra download. */
+.tab-label {
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 8.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  text-transform: lowercase;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
+  text-align: center;
+}

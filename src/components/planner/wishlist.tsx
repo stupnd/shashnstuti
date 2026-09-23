@@ -16,7 +16,7 @@ const PLACEHOLDER: Record<WishKind, string> = {
   present: "something they'd love…",
 };
 
-const NOTE_COLORS = ["var(--butter)", "var(--peach)", "var(--pink)", "var(--mint)", "var(--sky)", "var(--lilac)"];
+const NOTE_COLORS = ["var(--butter)", "var(--pink)", "var(--mint)", "var(--sky)", "var(--lilac)", "var(--peach)"];
 
 function tiltFor(id: string) {
   let h = 0;
@@ -287,10 +287,10 @@ export function Wishlist({
             return (
               <li
                 key={w.id}
-                className="relative rounded-2xl border-2 border-ink p-3 transition-transform hover:-translate-y-0.5 hover:rotate-0"
+                className="relative rounded-2xl border-[1.5px] border-line p-3 transition-transform hover:-translate-y-0.5 hover:rotate-0"
                 style={{
                   background: isDone ? "var(--bg-soft)" : color,
-                  boxShadow: `3px 3px 0 ${isDone ? "var(--line)" : "var(--ink)"}`,
+                  boxShadow: `2px 2px 0 var(--line)`,
                   transform: `rotate(${tiltFor(w.id)}deg)`,
                   opacity: isDone ? 0.65 : 1,
                 }}
@@ -302,7 +302,7 @@ export function Wishlist({
                     disabled={temp}
                     aria-pressed={isDone}
                     aria-label={isDone ? "Put it back on the list" : kind === "present" ? "Got it" : "Did it"}
-                    className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 border-ink bg-surface text-accent transition-transform hover:scale-110"
+                    className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-[1.5px] border-line bg-surface text-accent transition-transform hover:scale-110"
                   >
                     {isDone && <Icon name="check" size={13} strokeWidth={2.6} />}
                   </button>
@@ -370,7 +370,7 @@ export function Wishlist({
                     <button
                       type="button"
                       onClick={() => remove(w)}
-                      className="shrink-0 rounded-full p-1 text-ink/40 hover:bg-ink/10 hover:text-ink"
+                      className="tap shrink-0 rounded-full p-1 text-ink/40 hover:bg-ink/10 hover:text-ink"
                       aria-label="Remove"
                       title="remove"
                     >

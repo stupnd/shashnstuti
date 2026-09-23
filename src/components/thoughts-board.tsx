@@ -23,7 +23,7 @@ const QUICK: { label: string; body: string; icon: IconName; color: string }[] = 
   { label: "call me?", body: "call me when you can?", icon: "wave", color: "var(--mint)" },
 ];
 
-const NOTE_COLORS = ["var(--pink)", "var(--butter)", "var(--mint)", "var(--sky)", "var(--lilac)", "var(--peach)"];
+const NOTE_COLORS = ["var(--butter)", "var(--pink)", "var(--mint)", "var(--sky)", "var(--lilac)", "var(--peach)"];
 
 function timeLabel(iso: string) {
   const t = new Date(iso).getTime();
@@ -148,8 +148,8 @@ export function ThoughtsBoard({
         <div className="flex items-start justify-between gap-3">
           <div>
             <p className="label">throughout the day</p>
-            <h2 className="font-marker mt-1 text-3xl leading-tight">
-              <span className="hl" style={{ ["--hl" as string]: "var(--pink)" }}>thinking of you</span>
+            <h2 className="font-semibold tracking-tight mt-1 text-3xl leading-tight">
+              thinking of you
             </h2>
             <p className="mt-1 text-sm text-muted">
               {partner
@@ -216,7 +216,7 @@ export function ThoughtsBoard({
                 return (
                   <li
                     key={t.id}
-                    className="relative rounded-2xl border-2 border-ink p-3 shadow-[3px_3px_0_var(--note)] transition-transform hover:-translate-y-0.5 hover:rotate-0"
+                    className="relative rounded-2xl border-[1.5px] border-line p-3 shadow-[3px_3px_0_var(--note)] transition-transform hover:-translate-y-0.5 hover:rotate-0"
                     style={{
                       background: color,
                       ["--note" as string]: color,
@@ -234,7 +234,7 @@ export function ThoughtsBoard({
                       <button
                         type="button"
                         onClick={() => remove(t.id)}
-                        className="absolute right-2 top-2 rounded-full p-1 text-ink/40 hover:bg-ink/10 hover:text-ink"
+                        className="tap absolute right-2 top-2 rounded-full p-1 text-ink/40 hover:bg-ink/10 hover:text-ink"
                         aria-label="Take back"
                         title="take back"
                       >

@@ -42,7 +42,7 @@ export function PlayHub({
                   <Icon name={g.icon} size={22} strokeWidth={2} />
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="font-marker text-2xl leading-tight">{g.title}</p>
+                  <p className="font-semibold tracking-tight text-2xl leading-tight">{g.title}</p>
                   <p className="mt-0.5 text-sm text-muted">{g.blurb}</p>
                   <button
                     type="button"

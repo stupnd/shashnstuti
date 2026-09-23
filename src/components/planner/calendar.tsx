@@ -22,7 +22,7 @@ import { Icon } from "@/components/icons";
 import { Avatar } from "@/components/ui";
 
 const WEEKDAYS = ["s", "m", "t", "w", "t", "f", "s"];
-const DAY_COLORS = ["var(--pink)", "var(--butter)", "var(--mint)", "var(--sky)", "var(--lilac)", "var(--peach)"];
+const DAY_COLORS = ["var(--sky)", "var(--mint)", "var(--lilac)", "var(--peach)"];
 
 /** A stable pastel per day, so the same date is always the same colour. */
 function colorFor(date: string) {
@@ -198,8 +198,8 @@ export function PlannerCalendar({
           </button>
 
           <div className="text-center">
-            <h2 className="font-marker text-2xl leading-tight sm:text-3xl">
-              <span className="hl" style={{ ["--hl" as string]: "var(--sky)" }}>{monthLabel(month)}</span>
+            <h2 className="font-semibold tracking-tight text-2xl leading-tight sm:text-3xl">
+              {monthLabel(month)}
             </h2>
             <button
               type="button"
@@ -305,7 +305,7 @@ export function PlannerCalendar({
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <p className="label">{countdownLabel(selected, today)}</p>
-            <h3 className="font-marker mt-0.5 text-2xl leading-tight">{formatLongDate(selected)}</h3>
+            <h3 className="font-semibold tracking-tight mt-0.5 text-2xl leading-tight">{formatLongDate(selected)}</h3>
           </div>
           {!adding && (
             <button type="button" onClick={() => setAdding(true)} className="btn btn-primary shrink-0 px-3 py-2 text-sm">
@@ -373,7 +373,7 @@ export function PlannerCalendar({
                   <form
                     key={plan.id}
                     action={(form) => saveEdit(plan, form)}
-                    className="space-y-2.5 rounded-2xl border-2 border-ink p-3"
+                    className="space-y-2.5 rounded-2xl border-[1.5px] border-line p-3"
                     style={{ background: "var(--surface)", boxShadow: "3px 3px 0 var(--ink)" }}
                   >
                     <input
@@ -439,10 +439,10 @@ export function PlannerCalendar({
               return (
                 <div
                   key={plan.id}
-                  className="flex items-start gap-3 rounded-2xl border-2 border-ink p-3 transition-transform hover:-translate-y-0.5"
+                  className="flex items-start gap-3 rounded-2xl border-[1.5px] border-line p-3 transition-transform hover:-translate-y-0.5"
                   style={{
                     background: done ? "var(--bg-soft)" : colorFor(plan.date),
-                    boxShadow: `3px 3px 0 ${done ? "var(--line)" : "var(--ink)"}`,
+                    boxShadow: `2px 2px 0 var(--line)`,
                     opacity: done ? 0.7 : 1,
                   }}
                 >
@@ -452,7 +452,7 @@ export function PlannerCalendar({
                     disabled={plan.id.startsWith("temp-")}
                     aria-pressed={done}
                     aria-label={done ? "Mark as not done" : "Mark as done"}
-                    className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 border-ink bg-surface text-accent transition-transform hover:scale-110"
+                    className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-[1.5px] border-line bg-surface text-accent transition-transform hover:scale-110"
                   >
                     {done && <Icon name="check" size={13} strokeWidth={2.6} />}
                   </button>
@@ -488,7 +488,7 @@ export function PlannerCalendar({
                           setAdding(false);
                           setError(null);
                         }}
-                        className="rounded-full p-1 text-ink/40 hover:bg-ink/10 hover:text-ink"
+                        className="tap rounded-full p-1 text-ink/40 hover:bg-ink/10 hover:text-ink"
                         aria-label="Change this plan"
                         title="change it"
                       >
@@ -497,7 +497,7 @@ export function PlannerCalendar({
                       <button
                         type="button"
                         onClick={() => remove(plan)}
-                        className="rounded-full p-1 text-ink/40 hover:bg-ink/10 hover:text-ink"
+                        className="tap rounded-full p-1 text-ink/40 hover:bg-ink/10 hover:text-ink"
                         aria-label="Remove this plan"
                         title="remove"
                       >
@@ -528,13 +528,13 @@ export function PlannerCalendar({
                     style={{ ["--card-shadow" as string]: colorFor(plan.date) }}
                   >
                     <span
-                      className="flex h-12 w-12 shrink-0 flex-col items-center justify-center rounded-xl border-2 border-ink leading-none"
+                      className="flex h-12 w-12 shrink-0 flex-col items-center justify-center rounded-xl border-[1.5px] border-line leading-none"
                       style={{ background: colorFor(plan.date) }}
                     >
                       <span className="text-[9px] font-bold uppercase tracking-wider">
                         {fromDateOnly(plan.date).toLocaleDateString("en-US", { month: "short" })}
                       </span>
-                      <span className="font-marker text-lg">{fromDateOnly(plan.date).getDate()}</span>
+                      <span className="font-semibold tracking-tight text-lg">{fromDateOnly(plan.date).getDate()}</span>
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="font-hand block truncate text-xl leading-tight">{plan.title}</span>

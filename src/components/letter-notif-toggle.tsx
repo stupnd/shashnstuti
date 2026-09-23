@@ -69,7 +69,7 @@ export function LetterNotifToggle() {
   return (
     <div className="flex items-center justify-between gap-3">
       <div>
-        <p className="font-marker text-xl leading-tight">letter pings</p>
+        <p className="font-semibold tracking-tight text-xl leading-tight">letter pings</p>
         <p className="mt-1 text-sm text-muted">
           {on ? "we’ll nudge you when a sealed letter is waiting." : "turn on to get a ping for unopened letters."}
         </p>

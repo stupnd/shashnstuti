@@ -97,7 +97,7 @@ export function Timeline({
           <section key={ch.year}>
             <header className="mb-4 flex items-end justify-between gap-3">
               <div>
-                <h2 className="font-marker text-3xl"><span className="hl" style={{ "--hl": CHAPTER_HL[ch.year % CHAPTER_HL.length] } as CSSProperties}>year {ch.year}</span></h2>
+                <h2 className="font-semibold tracking-tight text-3xl"><span className="hl" style={{ "--hl": CHAPTER_HL[ch.year % CHAPTER_HL.length] } as CSSProperties}>year {ch.year}</span></h2>
                 <p className="label mt-1">{formatShortDate(from)} — {formatShortDate(to)}</p>
               </div>
               <Link href={`/watch?year=${ch.year}`} transitionTypes={["nav-forward"]} className="btn btn-sky py-2 text-sm">
@@ -124,7 +124,7 @@ export function Timeline({
       <div ref={sentinel} className="h-6" />
       {pending && <p className="label py-6 text-center">turning the page…</p>}
       {!cursor && entries.length > 0 && (
-        <p className="font-marker py-8 text-center text-2xl text-muted">the beginning</p>
+        <p className="font-semibold tracking-tight py-8 text-center text-2xl text-muted">the beginning</p>
       )}
     </div>
   );

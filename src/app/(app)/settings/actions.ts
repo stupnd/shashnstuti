@@ -71,3 +71,26 @@ export async function updateSpotifyUrl(
   revalidatePath("/", "layout");
   return { ok: true };
 }
+
+/**
+ * Point the profile at a freshly uploaded avatar object, and bin the old one.
+ * The upload itself happens in the browser (see AvatarPicker) so big camera
+ * photos never travel through a server action.
+ */
+export async function setAvatarPath(path: string | null): Promise<{ ok: true } | { error: string }> {
+  const me = await getCurrentProfile();
+  if (path && !path.startsWith(`${me.id}/`)) return { error: "that isn't your avatar" };
+
+  const supabase = await createClient();
+  const previous = me.avatar_path;
+
+  const { error } = await supabase.from("profiles").update({ avatar_path: path }).eq("id", me.id);
+  if (error) return { error: error.message };
+
+  if (previous && previous !== path) {
+    await supabase.storage.from("avatars").remove([previous]);
+  }
+
+  revalidatePath("/", "layout");
+  return { ok: true };
+}

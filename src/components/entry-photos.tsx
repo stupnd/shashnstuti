@@ -33,7 +33,7 @@ export function EntryPhotos({
     <PhotoPinButton
       photoId={photo.id}
       initiallyPinned={pinned.has(photo.id)}
-      className="!shadow-[2px_2px_0_var(--ink)]"
+      className="!shadow-[1px_1px_0_var(--line)]"
     />
   );
 

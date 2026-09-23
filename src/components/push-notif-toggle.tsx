@@ -168,7 +168,7 @@ export function PushNotifToggle() {
     <div className="space-y-2">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <p className="font-marker text-xl leading-tight">push pings</p>
+          <p className="font-semibold tracking-tight text-xl leading-tight">push pings</p>
           <p className="mt-1 text-sm text-muted">
             {on
               ? "we’ll nudge you for thoughts, letters, and new moments."

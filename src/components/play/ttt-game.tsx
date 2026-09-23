@@ -50,7 +50,7 @@ export function TicTacToe({ me, partner }: { me: PlayerInfo; partner: PlayerInfo
             type="button"
             disabled={!myTurn || Boolean(cell)}
             onClick={() => void onCell(i)}
-            className="card aspect-square flex items-center justify-center text-4xl font-marker transition-transform hover:-translate-y-0.5 disabled:opacity-100"
+            className="card aspect-square flex items-center justify-center text-4xl font-semibold tracking-tight transition-transform hover:-translate-y-0.5 disabled:opacity-100"
             style={{ ["--card-shadow" as string]: cell === "a" ? "var(--pink)" : cell === "b" ? "var(--sky)" : "var(--line)" }}
             aria-label={cell ? (cell === "a" ? "X" : "O") : `cell ${i + 1}`}
           >

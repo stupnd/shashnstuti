@@ -20,7 +20,7 @@ export function DateEditor({ id, date, canEdit, unsure }: { id: string; date: st
       <button
         type="button"
         onClick={() => setEditing(true)}
-        className={`inline-flex items-center gap-1.5 rounded-full border-2 border-ink px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-[0.15em] hover:bg-butter ${unsure ? "bg-butter" : "bg-surface"}`}
+        className={`inline-flex items-center gap-1.5 rounded-full border-[1.5px] border-line px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-[0.15em] hover:bg-butter ${unsure ? "bg-butter" : "bg-surface"}`}
         title="Change the date"
       >
         <Icon name="edit" size={12} /> {unsure ? "date unknown — tap to set" : formatLongDate(date)}

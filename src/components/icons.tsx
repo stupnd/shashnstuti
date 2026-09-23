@@ -76,6 +76,13 @@ const P = {
   ),
   /** Clock face — the time on a planned date. */
   clock: <><circle cx="12" cy="12" r="8.2" /><path d="M12 7.4V12l3.1 2" /></>,
+  /** Speech bubble — the messages board. */
+  chat: (
+    <>
+      <path d="M4.5 6.2h15c.6 0 1 .5 1 1v7.6c0 .6-.4 1-1 1H9.8L5.5 19v-3.2h-1c-.6 0-1-.4-1-1V7.2c0-.5.4-1 1-1Z" />
+      <path d="M8.2 10.4h7.6M8.2 13h4.6" />
+    </>
+  ),
   gear: <><circle cx="12" cy="12" r="3" /><path d="M12 3.5v2.3M12 18.2v2.3M3.5 12h2.3M18.2 12h2.3M6 6l1.6 1.6M16.4 16.4 18 18M6 18l1.6-1.6M16.4 7.6 18 6" /></>,
   plus: <path d="M12 5.5v13M5.5 12h13" />,
   back: <path d="M15.5 5.5 9 12l6.5 6.5" />,
@@ -136,18 +143,6 @@ export function Icon({
       {...rest}
     >
       {node}
-    </svg>
-  );
-}
-
-/** Define once near the top of <body>. Gives .doodle strokes an ink wobble. */
-export function RoughFilter() {
-  return (
-    <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden>
-      <filter id="rough" x="-10%" y="-10%" width="120%" height="120%">
-        <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" seed="3" result="n" />
-        <feDisplacementMap in="SourceGraphic" in2="n" scale="1.1" xChannelSelector="R" yChannelSelector="G" />
-      </filter>
     </svg>
   );
 }

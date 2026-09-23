@@ -55,12 +55,13 @@ export async function sendThought(raw: string): Promise<{ ok: true; thought: Tho
   };
   await writeState(next);
   await notifyPartner(partner.id, {
-    title: `${me.display_name} is thinking of you`,
+    title: me.display_name,
     body: body.length > 80 ? `${body.slice(0, 77)}…` : body,
-    url: "/",
+    url: "/messages",
     tag: "thought",
   });
   revalidatePath("/");
+  revalidatePath("/messages");
   return { ok: true, thought };
 }
 

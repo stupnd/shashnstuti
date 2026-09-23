@@ -108,7 +108,7 @@ export function ShowdownGame({ me, partner }: { me: PlayerInfo; partner: PlayerI
           reveal={state.last ? (mySeat === "a" ? state.last.a : state.last.b) : myPick}
           waiting={!myPick && state.status === "playing"}
         />
-        <span className="font-marker text-2xl">vs</span>
+        <span className="font-semibold tracking-tight text-2xl">vs</span>
         <PickStatus
           label={partner.name}
           ready={Boolean(theirPick)}
@@ -160,7 +160,7 @@ function PickStatus({
     <div className="flex w-24 flex-col items-center">
       <p className="label mb-2 truncate">{label}</p>
       <div
-        className="flex h-16 w-16 items-center justify-center rounded-2xl border-2 border-ink text-2xl"
+        className="flex h-16 w-16 items-center justify-center rounded-2xl border-[1.5px] border-line text-2xl"
         style={{ background: ready || reveal ? "var(--butter)" : "var(--surface)" }}
       >
         {reveal && reveal !== "ready" ? EMOJI[reveal] : ready || reveal === "ready" ? "✓" : waiting ? "?" : "—"}

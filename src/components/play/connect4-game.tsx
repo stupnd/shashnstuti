@@ -59,7 +59,7 @@ export function ConnectFour({ me, partner }: { me: PlayerInfo; partner: PlayerIn
                 return (
                   <span
                     key={row}
-                    className="aspect-square w-full rounded-full border-2 border-ink/20 bg-surface"
+                    className="aspect-square w-full rounded-full border-[1.5px] border-line/20 bg-surface"
                     style={{
                       background: cell === "a" ? "var(--accent)" : cell === "b" ? "var(--butter)" : "var(--surface)",
                       borderColor: cell ? "var(--ink)" : undefined,

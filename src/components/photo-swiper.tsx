@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { ViewTransition } from "react";
 import type { PhotoWithUrl } from "@/lib/entries";
@@ -127,14 +128,14 @@ export function PhotoSwiper({
         {photos.map((p, i) => (
           <div key={p.id} className="flex items-center justify-center" style={{ height: "min(72vh, 640px)" }}>
             <ViewTransition name={`photo-${p.id}`} share="morph" default="none">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 src={p.url}
                 alt={p.caption ?? (count > 1 ? `${alt} (${i + 1} of ${count})` : alt)}
                 width={p.width}
                 height={p.height}
+                sizes="(min-width: 768px) 768px, 100vw"
+                priority={i === 0}
                 className="h-full w-full object-contain"
-                loading={i === 0 ? "eager" : "lazy"}
               />
             </ViewTransition>
           </div>

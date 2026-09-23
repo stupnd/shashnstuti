@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import type { CSSProperties } from "react";
 import { ViewTransition } from "react";
@@ -55,7 +56,7 @@ export function EntryTile({
   const mine = entry.author === meId;
   const caption = entry.title || (entry.note ? excerpt(entry.note, span === "square" ? 34 : 70) : cover?.caption ?? "");
   const color = entry.is_milestone ? "var(--accent-soft)" : PASTELS[Math.abs(Math.round(seeded(entry.id, 5) * 10)) % PASTELS.length];
-  const tilt = seeded(entry.id, 9) * 2.2;
+  const tilt = seeded(entry.id, 9) * 1.1; // photos still lean a little; cards no longer do
 
   return (
     <div className={`relative ${SPAN_CLASS[span]}`}>
@@ -67,8 +68,13 @@ export function EntryTile({
       >
         {cover ? (
           <ViewTransition name={`photo-${cover.id}`} share="morph" default="none">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={cover.url} alt={cover.caption ?? entry.title ?? ""} loading="lazy" className="object-center" />
+            <Image
+              src={cover.url}
+              alt={cover.caption ?? entry.title ?? ""}
+              fill
+              sizes={"(min-width: 640px) 192px, 45vw"}
+              className="object-cover object-center"
+            />
           </ViewTransition>
         ) : (
           <div className="flex h-full min-h-[9rem] items-center justify-center text-muted">
@@ -116,7 +122,7 @@ export function EntryTile({
             photoId={cover.id}
             initiallyPinned={coverPinned}
             size="sm"
-            className="!shadow-[2px_2px_0_var(--ink)]"
+            className="!shadow-[1px_1px_0_var(--line)]"
           />
         </div>
       )}

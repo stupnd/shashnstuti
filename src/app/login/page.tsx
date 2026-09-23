@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { ThemeToggle } from "@/components/theme";
-import { Doodles, Squiggle } from "@/components/ui";
+import { Squiggle } from "@/components/ui";
 import { LoginForm } from "./login-form";
 
 export const metadata: Metadata = { title: "sign in" };
@@ -8,7 +8,6 @@ export const metadata: Metadata = { title: "sign in" };
 export default function LoginPage() {
   return (
     <main className="relative flex flex-1 flex-col items-center justify-center overflow-hidden px-5 py-16">
-      <Doodles />
       <div className="absolute right-4 top-[calc(0.75rem+env(safe-area-inset-top))] z-20">
         <ThemeToggle />
       </div>

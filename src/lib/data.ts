@@ -1,14 +1,17 @@
 import { cache } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import type { Profile, Settings } from "@/lib/database.types";
+import type { Person, Settings } from "@/lib/database.types";
+
+/** Matches the photo TTL: long enough that the image optimizer can cache it. */
+export const AVATAR_URL_TTL = 60 * 60 * 24;
 
 /**
  * Per-request cached loaders for things nearly every page needs.
  * `cache()` dedupes calls within one server render.
  */
 
-export const getCurrentProfile = cache(async (): Promise<Profile> => {
+export const getCurrentProfile = cache(async (): Promise<Person> => {
   const supabase = await createClient();
   const {
     data: { user },
@@ -27,17 +30,37 @@ export const getCurrentProfile = cache(async (): Promise<Profile> => {
     await supabase.auth.signOut();
     redirect("/login");
   }
-  return profile;
+  // Reuse the request-cached list so the avatar is signed once, not per call.
+  const all = await getProfiles();
+  return all.find((p) => p.id === profile.id) ?? { ...profile, avatar_url: null };
 });
 
-export const getProfiles = cache(async (): Promise<Profile[]> => {
+/**
+ * Both profiles, with any avatar photo signed. There are only ever two rows,
+ * so this is a single extra storage call per request — and it's cached, so
+ * every Avatar on the page shares it.
+ */
+export const getProfiles = cache(async (): Promise<Person[]> => {
   const supabase = await createClient();
   const { data } = await supabase.from("profiles").select("*").order("created_at");
-  return data ?? [];
+  const rows = data ?? [];
+
+  const paths = rows.map((r) => r.avatar_path).filter((p): p is string => Boolean(p));
+  const urls = new Map<string, string>();
+  if (paths.length) {
+    const { data: signed } = await supabase.storage
+      .from("avatars")
+      .createSignedUrls(paths, AVATAR_URL_TTL);
+    for (const item of signed ?? []) {
+      if (item.path && item.signedUrl) urls.set(item.path, item.signedUrl);
+    }
+  }
+
+  return rows.map((r) => ({ ...r, avatar_url: r.avatar_path ? urls.get(r.avatar_path) ?? null : null }));
 });
 
 /** The other person, if they've signed in at least once. */
-export async function getPartner(): Promise<Profile | null> {
+export async function getPartner(): Promise<Person | null> {
   const [me, all] = await Promise.all([getCurrentProfile(), getProfiles()]);
   return all.find((p) => p.id !== me.id) ?? null;
 }

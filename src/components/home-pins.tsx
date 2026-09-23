@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useOptimistic, useRef, useState, useTransition, type CSSProperties } from "react";
@@ -124,8 +125,7 @@ export function HomePinTile({
         className="tile block h-full min-h-[9rem]"
         style={{ "--tile": color, "--tilt": `${tilt}deg` } as CSSProperties}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={pin.url} alt={caption} loading="lazy" className="object-center" />
+        <Image src={pin.url} alt={caption} fill sizes={"(min-width: 640px) 192px, 45vw"} className="object-cover object-center" />
         <div className="tile-strip">
           <p className="font-hand line-clamp-1 text-lg leading-tight text-ink">{caption}</p>
           <p className="mt-0.5 text-[9px] font-bold uppercase tracking-[0.18em] text-muted">{formatShortDate(pin.date)}</p>
@@ -136,7 +136,7 @@ export function HomePinTile({
           photoId={pin.photoId}
           initiallyPinned
           size="sm"
-          className="!shadow-[2px_2px_0_var(--ink)]"
+          className="!shadow-[1px_1px_0_var(--line)]"
           onChange={(pinned) => {
             if (!pinned) onUnpinned?.(pin.photoId);
           }}
@@ -161,7 +161,7 @@ export function HomePinsGrid({ initial }: { initial: HomePinCard[] }) {
         <span className="sticker h-14 w-14 bg-peach text-ink">
           <Icon name="pushpin" size={24} />
         </span>
-        <p className="font-marker text-2xl leading-tight">pin your favorites</p>
+        <p className="font-semibold tracking-tight text-2xl leading-tight">pin your favorites</p>
         <p className="max-w-xs text-sm text-muted">go through photos and pushpin the ones you want on home</p>
       </Link>
     );
@@ -274,8 +274,13 @@ export function PinPicker({
                   } as CSSProperties
                 }
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={p.url} alt={p.caption ?? p.title ?? ""} className="h-full w-full object-cover" loading="lazy" />
+                <Image
+                  src={p.url}
+                  alt={p.caption ?? p.title ?? ""}
+                  fill
+                  sizes={"(min-width: 640px) 192px, 45vw"}
+                  className="object-cover object-center"
+                />
                 <div className="tile-strip">
                   <p className="font-hand line-clamp-1 text-base leading-tight">{p.caption || p.title || formatShortDate(p.date)}</p>
                 </div>
@@ -296,5 +301,5 @@ export function PinPicker({
 
 /** @deprecated use PhotoPinButton */
 export function EntryPinButton(props: { photoId: string; initiallyPinned: boolean }) {
-  return <PhotoPinButton {...props} className="!shadow-[2px_2px_0_var(--ink)]" />;
+  return <PhotoPinButton {...props} className="!shadow-[1px_1px_0_var(--line)]" />;
 }

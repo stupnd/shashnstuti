@@ -14,7 +14,11 @@ export type ReactionWithAuthor = Reaction & {
   author_profile: Pick<Profile, "id" | "display_name" | "avatar_emoji">;
 };
 
-export const SIGNED_URL_TTL = 60 * 60; // 1 hour
+/**
+ * 24h, not 1h: the signed URL is the cache key for Next's image optimizer, so
+ * a short TTL means every photo gets re-optimized every hour for no reason.
+ */
+export const SIGNED_URL_TTL = 60 * 60 * 24;
 export const PAGE_SIZE = 24;
 
 type SupabaseServer = Awaited<ReturnType<typeof createClient>>;

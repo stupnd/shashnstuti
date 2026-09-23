@@ -50,7 +50,7 @@ export function AskForm({ meId }: { meId: string }) {
       </div>
 
       {pending && (
-        <p className="font-marker text-center text-2xl text-muted animate-pulse">flipping through the pages…</p>
+        <p className="font-semibold tracking-tight text-center text-2xl text-muted animate-pulse">flipping through the pages…</p>
       )}
 
       {!pending && result && "error" in result && (

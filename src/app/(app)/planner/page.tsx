@@ -60,7 +60,7 @@ export default async function PlannerPage() {
             </span>
             <span className="min-w-0 flex-1">
               <span className="label">{next ? countdownLabel(next.date, today) : "when you pick a day"}</span>
-              <span className="font-marker mt-0.5 block truncate text-2xl leading-tight">
+              <span className="font-semibold tracking-tight mt-0.5 block truncate text-2xl leading-tight">
                 {next ? next.title : "the calendar"}
               </span>
               <span className="text-sm text-muted">
